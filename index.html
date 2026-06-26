@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagrama de Integración MARAD – ERP</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #F0F4F8;
+    color: #1A2332;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px;
+  }
+
+  h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4A5568;
+    margin-bottom: 32px;
+  }
+
+  .canvas {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    max-width: 1600px;
+    position: relative;
+  }
+
+  #connectorSvgCross {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 20;
+  }
+
+  /* ── MARAD block ── */
+  .block-marad {
+    flex: 2;
+    border: 2px solid #3B6EA5;
+    border-radius: 10px;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .block-label {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .label-marad {
+    background: #3B6EA5;
+    color: #FFFFFF;
+  }
+
+  .block-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 16px;
+    gap: 8px;
+    position: relative;
+  }
+
+  /* ── Section divider ── */
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: #CBD5E0;
+    margin: 2px 0;
+  }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #718096;
+    margin-bottom: 4px;
+  }
+
+  /* ── Connector arrow (between MARAD and ERP) ── */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .connector svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* ── Proveedores block ── */
+  .block-prov {
+    flex: 1;
+    border: 2px solid #C05621;
+    border-radius: 10px;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .label-prov { background: #C05621; color: #FFFFFF; }
+  .prov-entity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FBBF7C;
+    border-radius: 8px;
+    padding: 10px 6px;
+    background: #FFF7ED;
+    gap: 6px;
+    text-align: center;
+  }
+
+  /* ── ERP block ── */
+  .block-erp {
+    flex: 2;
+    border: 2px solid #2D7A5F;
+    border-radius: 10px;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .label-erp {
+    background: #2D7A5F;
+    color: #FFFFFF;
+  }
+
+  /* Placeholder content */
+  .placeholder {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #A0AEC0;
+    font-size: 0.8rem;
+    font-style: italic;
+    padding: 24px;
+    text-align: center;
+  }
+
+  /* ── Ship tiles (Step 2) ── */
+  .tiles-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: stretch;
+  }
+
+  .marad-top-wrap {
+    border: 1px solid #BED3EE;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: #F7FAFF;
+    padding: 7px;
+  }
+
+  .compras-box {
+    border: 1px solid #BED3EE;
+    border-radius: 8px;
+    background: #F7FAFF;
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+  .block-erp .compras-box {
+    border-color: #9ACFC0;
+    background: #F2FAF6;
+  }
+
+  .ship-tile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: #F7FAFF;
+    border: 1px solid #BED3EE;
+    border-radius: 8px;
+    padding: 7px 16px;
+  }
+
+  .tile-icon-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tile-icon-label {
+    font-size: 0.58rem;
+    font-weight: 600;
+    color: #4A6FA5;
+    text-align: center;
+    max-width: 72px;
+    line-height: 1.2;
+  }
+
+  .tile-arrow {
+    color: #7A95B8;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 2px;
+  }
+
+  .tiles-ellipsis {
+    font-size: 1.2rem;
+    color: #A0AEC0;
+    letter-spacing: 0.1em;
+    padding: 0 16px;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+  }
+
+  /* ── Bottom section — Step 3 ── */
+  .bottom-section {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .biblioteca-db {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #F0FAF6;
+    border: 1px solid #9AD5C0;
+    border-radius: 8px;
+    padding: 10px 10px;
+  }
+
+  .biblioteca-db .tile-icon-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    max-width: 120px;
+    color: #1E6648;
+  }
+
+  .mapeo-wrap {
+    flex: 1;
+  }
+
+  .mapeo-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #3B6EA5;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .table-scroll {
+    overflow-x: visible;
+  }
+
+  .mapeo-table {
+    border-collapse: collapse;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    width: 100%;
+  }
+
+  .mapeo-table th {
+    background: #EBF4FF;
+    border: 1px solid #BED3EE;
+    padding: 3px 7px;
+    font-weight: 600;
+    color: #2C4D7A;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .comp-header {
+    text-align: left;
+    min-width: 150px;
+  }
+
+  .connector-col {
+    min-width: 44px;
+    background: #D6E8FF;
+    color: #3B6EA5;
+  }
+
+  .ellipsis-th {
+    background: #F7FAFF;
+    color: #A0AEC0;
+    letter-spacing: 0.2em;
+    border-color: #E2E8F0;
+  }
+
+  .mapeo-table td {
+    border: 1px solid #CBD5E0;
+    padding: 3px 7px;
+  }
+
+  .mapeo-table tr:nth-child(even) td {
+    background: #F7FAFF;
+  }
+
+  .comp-cell {
+    color: #2D3748;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  .dot-cell {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .dot-cell.filled { color: #3B6EA5; }
+  .dot-cell.empty  { color: #CBD5E0; }
+  .ellipsis-td     { text-align: center; color: #A0AEC0; background: #FAFBFC; letter-spacing: 0.15em; }
+
+  /* SVG overlay for connector lines */
+  #connectorSvg, #connectorSvgErp, #connectorSvgErpTop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 5;
+  }
+
+  /* ERP block color overrides */
+  .block-erp .ship-tile          { background: #F2FAF6; border-color: #9ACFC0; }
+  .erp-top-split    { display: flex; flex-direction: row; border: 1px solid #9ACFC0; border-radius: 8px; overflow: hidden; position: relative; }
+  .erp-left-col     { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #F2FAF6; }
+  .erp-vert-divider { width: 1px; background: #9ACFC0; opacity: 0.5; flex-shrink: 0; }
+  .ship-tile-divider { width: 1px; background: #BED3EE; align-self: stretch; flex-shrink: 0; margin: 0 10px; opacity: 0.7; }
+  .core-highlight {
+    background: #FFFBEB !important;
+    border: 2px solid #D97706 !important;
+    box-shadow: 0 0 0 3px rgba(217,119,6,0.18), 0 2px 8px rgba(217,119,6,0.12);
+  }
+  .core-highlight .tile-icon-label { color: #92400E !important; font-weight: 700 !important; }
+  .sol-col { width: 70px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+  .marad-top-wrap .ship-tile { justify-content: flex-start; }
+  #maradBody .compras-box { gap: 0; justify-content: center; }
+  .erp-right-col    { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #EBF6F2; padding: 20px 16px; }
+  .block-erp .tile-icon-label    { color: #2A6A50; }
+  .block-erp .mapeo-title        { color: #2D7A5F; }
+  .block-erp .biblioteca-db      { background: #EBF6F2; border-color: #9ACFC0; }
+  .block-erp .biblioteca-db .tile-icon-label { color: #1A5040; }
+  .block-erp .mapeo-table th     { background: #D4EEE6; border-color: #9ACFC0; color: #1A5040; }
+  .block-erp .mapeo-table .connector-col { background: #B0E0D0; color: #2D7A5F; }
+  .block-erp .mapeo-table td     { border-color: #B0D8CA; }
+  .block-erp .mapeo-table tr:nth-child(even) td { background: #F0FAF6; }
+
+  /* ── Solicitud status hotspot ── */
+  #solicitudHotspot {
+    position: absolute; z-index: 25; border-radius: 6px; cursor: zoom-in;
+    background: rgba(160,160,160,0.18); border: 1.5px solid rgba(0,0,0,0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #solicitudHotspot:hover { background: rgba(160,160,160,0.32); border-color: rgba(0,0,0,0.6); }
+
+  #solicitudModal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,35,50,0.52); z-index: 3000;
+    align-items: center; justify-content: center;
+  }
+  #solicitudModal .zm-box {
+    background: #fff; border-radius: 14px; padding: 32px 36px 28px;
+    width: 560px; max-width: 94vw; position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+
+  .sol-status-flow {
+    display: flex; flex-direction: row; align-items: flex-start;
+    justify-content: space-between; gap: 8px; margin-top: 20px;
+  }
+  .sol-status-step {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;
+  }
+  .sol-status-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; border: 2px solid;
+  }
+  .sol-status-label {
+    font-size: 0.72rem; font-weight: 700; text-align: center; color: #2D3748;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .sol-status-desc {
+    font-size: 0.68rem; color: #718096; text-align: center; line-height: 1.4;
+  }
+  .sol-status-connector {
+    flex-shrink: 0; width: 28px; margin-top: 22px;
+    border-top: 2px dashed #CBD5E0;
+  }
+
+  /* ── Plan tree hotspot ── */
+  #maradPlanHotspot {
+    position: absolute;
+    z-index: 25;
+    border-radius: 6px;
+    cursor: zoom-in;
+    background: rgba(160, 160, 160, 0.18);
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #maradPlanHotspot:hover {
+    background: rgba(160, 160, 160, 0.32);
+    border-color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* ── Plan tree modal ── */
+  #maradPlanModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 35, 50, 0.52);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+  }
+  #maradPlanModal .zm-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 36px 28px;
+    width: 680px;
+    max-width: 94vw;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+
+  /* ── Zoom hotspot ── */
+  #zoomHotspot {
+    position: absolute;
+    z-index: 25;
+    border-radius: 8px;
+    cursor: zoom-in;
+    background: rgba(160, 160, 160, 0.18);
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #zoomHotspot:hover {
+    background: rgba(160, 160, 160, 0.32);
+    border-color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* ── Zoom modal ── */
+  #zoomModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 35, 50, 0.52);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+  }
+  #zoomModalBox {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 36px 28px;
+    width: 620px;
+    max-width: 93vw;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+  #zoomModal .zm-close {
+    position: absolute; top: 14px; right: 18px;
+    border: none; background: none; font-size: 1.4rem;
+    cursor: pointer; color: #718096; line-height: 1;
+    padding: 0 4px;
+  }
+  #zoomModal .zm-close:hover { color: #1A2332; }
+  #zoomModal .zm-eyebrow {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: #6B46C1; margin-bottom: 4px;
+  }
+  #zoomModal .zm-title {
+    font-size: 1.05rem; font-weight: 700; color: #1A2332; margin-bottom: 22px;
+  }
+  #zoomModal .zm-legend {
+    width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 20px;
+  }
+  #zoomModal .zm-legend th {
+    padding: 7px 12px; text-align: left; background: #F7F9FC;
+    border-bottom: 2px solid #E2E8F0; color: #4A5568; font-weight: 600;
+  }
+  #zoomModal .zm-legend td {
+    padding: 8px 12px; border-bottom: 1px solid #EDF2F7; color: #4A5568;
+  }
+  #zoomModal .zm-legend tr:last-child td { border-bottom: none; }
+  #zoomModal .zm-legend tr:nth-child(even) td { background: #FAFBFC; }
+  .block-erp .dot-cell.filled    { color: #2D7A5F; }
+  .block-erp .dot-cell.empty     { color: #B0D8CA; }
+</style>
+</head>
+<body>
+
+<h1>Diagrama de Integración — MARAD &amp; ERP</h1>
+
+<div class="canvas">
+
+  <!-- MARAD block -->
+  <div class="block-marad">
+    <div class="block-label label-marad">MARAD</div>
+    <div class="block-body" id="maradBody">
+
+      <!-- Compras y Requisiciones -->
+      <div class="section-label">Compras y Requisiciones</div>
+      <div class="compras-box">
+        <div class="tile-icon-wrap sol-col">
+          <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+            <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#3B6EA5"/>
+            <line x1="10" y1="14" x2="24" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
+            <line x1="10" y1="19" x2="24" y2="19" stroke="#7AAAD4" stroke-width="1.2"/>
+            <line x1="10" y1="24" x2="20" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+            <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+            <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#3B6EA5" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+            <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+          </svg>
+          <span class="tile-icon-label">Solicitud de<br>Materiales</span>
+        </div>
+      </div>
+      <div class="section-divider"></div>
+
+      <!-- Top section: Plan de Mantenimiento → Inventario Barco N -->
+      <div class="section-label">Planes de Mantenimiento / Inventarios por Barco</div>
+      <div class="marad-top-wrap">
+      <div class="tiles-row">
+
+        <!-- Barco 1 -->
+        <div class="ship-tile">
+          <div class="tile-icon-wrap sol-col">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#3B6EA5"/>
+              <line x1="10" y1="14" x2="24" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="19" x2="24" y2="19" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="24" x2="20" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+              <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#3B6EA5" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+            </svg>
+            <span class="tile-icon-label">Solicitud<br>Mat.</span>
+          </div>
+          <div class="ship-tile-divider"></div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="22" height="28" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M18 2v8h8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M24 2l6 8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="6" y1="16" x2="20" y2="16" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="20" x2="20" y2="20" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+            </svg>
+            <span class="tile-icon-label">Plan de<br>Mantenimiento</span>
+          </div>
+          <div class="tile-arrow">→</div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="3" y="8" width="28" height="20" fill="#EBF2FF" stroke="none"/>
+              <line x1="3" y1="8" x2="3" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="31" y1="8" x2="31" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="28" rx="14" ry="5" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
+            </svg>
+            <span class="tile-icon-label">Inventario<br>Barco 1</span>
+          </div>
+        </div>
+
+        <div class="tiles-ellipsis">···</div>
+
+        <!-- Barco N -->
+        <div class="ship-tile">
+          <div class="tile-icon-wrap sol-col">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#3B6EA5"/>
+              <line x1="10" y1="14" x2="24" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="19" x2="24" y2="19" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="24" x2="20" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+              <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#3B6EA5" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+            </svg>
+            <span class="tile-icon-label">Solicitud<br>Mat.</span>
+          </div>
+          <div class="ship-tile-divider"></div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="22" height="28" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M18 2v8h8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M24 2l6 8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="6" y1="16" x2="20" y2="16" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="20" x2="20" y2="20" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+            </svg>
+            <span class="tile-icon-label">Plan de<br>Mantenimiento</span>
+          </div>
+          <div class="tile-arrow">→</div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="3" y="8" width="28" height="20" fill="#EBF2FF" stroke="none"/>
+              <line x1="3" y1="8" x2="3" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="31" y1="8" x2="31" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="28" rx="14" ry="5" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
+            </svg>
+            <span class="tile-icon-label">Inventario<br>Barco N</span>
+          </div>
+        </div>
+
+        <!-- Terminal MOTI -->
+        <div class="ship-tile" style="border-color: #E53E3E;">
+          <div class="tile-icon-wrap sol-col">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#3B6EA5"/>
+              <line x1="10" y1="14" x2="24" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="19" x2="24" y2="19" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="10" y1="24" x2="20" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+              <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#3B6EA5" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+              <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
+            </svg>
+            <span class="tile-icon-label">Solicitud<br>Mat.</span>
+          </div>
+          <div class="ship-tile-divider"></div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="22" height="28" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M18 2v8h8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <path d="M24 2l6 8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="6" y1="16" x2="20" y2="16" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="20" x2="20" y2="20" stroke="#7AAAD4" stroke-width="1.2"/>
+              <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+            </svg>
+            <span class="tile-icon-label">Plan de<br>Mantenimiento</span>
+          </div>
+          <div class="tile-arrow">→</div>
+          <div class="tile-icon-wrap">
+            <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <rect x="3" y="8" width="28" height="20" fill="#EBF2FF" stroke="none"/>
+              <line x1="3" y1="8" x2="3" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <line x1="31" y1="8" x2="31" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="28" rx="14" ry="5" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
+              <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
+            </svg>
+            <span class="tile-icon-label">Inventario<br>Terminal MOTI</span>
+          </div>
+        </div>
+
+      </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Bottom section: Biblioteca DB → Mapeo matrix -->
+      <div class="section-label">Biblioteca de Artículos / Mapeo</div>
+      <div class="bottom-section">
+
+        <!-- Biblioteca de Artículos DB -->
+        <div class="biblioteca-db core-highlight">
+          <svg width="68" height="78" viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="19" cy="9" rx="16" ry="6" fill="#E8F4F0" stroke="#2D7A5F" stroke-width="1.5"/>
+            <rect x="3" y="9" width="32" height="24" fill="#E8F4F0" stroke="none"/>
+            <line x1="3" y1="9" x2="3" y2="33" stroke="#2D7A5F" stroke-width="1.5"/>
+            <line x1="35" y1="9" x2="35" y2="33" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="19" cy="33" rx="16" ry="6" fill="#C6F0E4" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="19" cy="19" rx="16" ry="6" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+          </svg>
+          <span class="tile-icon-label">Biblioteca de<br>Artículos</span>
+        </div>
+
+        <div class="tile-arrow" style="font-size:1.4rem; color:#5BAD90; align-self:center;">→</div>
+
+        <!-- Mapeo matrix -->
+        <div class="mapeo-wrap">
+          <div class="mapeo-title">Mapeo Biblioteca – Barco</div>
+          <div class="table-scroll">
+            <table class="mapeo-table">
+              <thead>
+                <tr>
+                  <th class="comp-header">Artículo</th>
+                  <th class="connector-col">B1</th>
+                  <th class="connector-col">B2</th>
+                  <th class="connector-col">Bn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="comp-cell">Motores Principales</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. de Navegación</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell empty">○</td>
+
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. Hidráulicos</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+
+                  <td class="dot-cell empty">○</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Equipos de Cubierta</td>
+                  <td class="dot-cell empty">○</td>
+                  <td class="dot-cell filled">●</td>
+
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. Eléctricos</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+
+                  <td class="dot-cell filled">●</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SVG overlay: draws dashed lines from matrix col headers up to inventory DBs -->
+      <svg id="connectorSvg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrowBlue" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+            <polygon points="0 0, 7 2.5, 0 5" fill="#3B6EA5" opacity="0.75"/>
+          </marker>
+        </defs>
+      </svg>
+
+    </div>
+  </div>
+
+  <div class="connector"></div>
+
+  <!-- ERP block -->
+  <div class="block-erp">
+    <div class="block-label label-erp">ERP</div>
+    <div class="block-body" id="erpBody">
+
+      <!-- Compras y Requisiciones -->
+      <div class="section-label">Compras y Requisiciones</div>
+      <div class="compras-box" style="gap:4px; padding:8px;">
+
+        <!-- Req. de Materiales -->
+        <div class="ship-tile" style="flex:1; padding:8px 6px;">
+          <div class="tile-icon-wrap">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+              <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#2D7A5F"/>
+              <line x1="10" y1="14" x2="24" y2="14" stroke="#5BAD90" stroke-width="1.2"/>
+              <line x1="10" y1="19" x2="24" y2="19" stroke="#5BAD90" stroke-width="1.2"/>
+              <line x1="10" y1="24" x2="20" y2="24" stroke="#5BAD90" stroke-width="1.2"/>
+              <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#2D7A5F" stroke-width="1"/>
+              <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#2D7A5F" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#2D7A5F" stroke-width="1"/>
+              <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#2D7A5F" stroke-width="1"/>
+            </svg>
+            <span class="tile-icon-label">Req. de<br>Materiales</span>
+          </div>
+        </div>
+
+        <div class="tile-arrow" style="color:#2D7A5F; font-size:0.9rem;">→</div>
+
+        <!-- Consolidación -->
+        <div class="ship-tile core-highlight" style="flex:1; padding:8px 6px;">
+          <div class="tile-icon-wrap">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2"  y="2"  width="11" height="13" rx="1.5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.3"/>
+              <rect x="19" y="2"  width="11" height="13" rx="1.5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.3"/>
+              <line x1="4"  y1="6"  x2="11" y2="6"  stroke="#5BAD90" stroke-width="1"/>
+              <line x1="4"  y1="9"  x2="11" y2="9"  stroke="#5BAD90" stroke-width="1"/>
+              <line x1="21" y1="6"  x2="28" y2="6"  stroke="#5BAD90" stroke-width="1"/>
+              <line x1="21" y1="9"  x2="28" y2="9"  stroke="#5BAD90" stroke-width="1"/>
+              <path d="M7.5 15 L16 21 L24.5 15" fill="none" stroke="#2D7A5F" stroke-width="1.3" stroke-linejoin="round"/>
+              <rect x="9"  y="22" width="14" height="12" rx="1.5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.3"/>
+              <line x1="11" y1="26" x2="21" y2="26" stroke="#5BAD90" stroke-width="1"/>
+              <line x1="11" y1="29" x2="18" y2="29" stroke="#5BAD90" stroke-width="1"/>
+            </svg>
+            <span class="tile-icon-label">Consoli-<br>dación</span>
+          </div>
+        </div>
+
+        <div class="tile-arrow" style="color:#2D7A5F; font-size:0.9rem;">→</div>
+
+        <!-- Cotización -->
+        <div class="ship-tile" style="flex:1; padding:8px 6px;">
+          <div class="tile-icon-wrap">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="20" height="26" rx="2" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+              <path d="M18 4v7h6" fill="none" stroke="#2D7A5F" stroke-width="1.4"/>
+              <path d="M18 4l6 7" fill="none" stroke="#2D7A5F" stroke-width="1.4"/>
+              <line x1="7" y1="15" x2="19" y2="15" stroke="#5BAD90" stroke-width="1.1"/>
+              <line x1="7" y1="19" x2="19" y2="19" stroke="#5BAD90" stroke-width="1.1"/>
+              <text x="13" y="29" font-size="9" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif" text-anchor="middle">$</text>
+              <circle cx="23" cy="28" r="5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.2"/>
+              <text x="23" y="31" font-size="6" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif" text-anchor="middle">%</text>
+            </svg>
+            <span class="tile-icon-label">Cotiza-<br>ción</span>
+          </div>
+        </div>
+
+        <div class="tile-arrow" style="color:#2D7A5F; font-size:0.9rem;">→</div>
+
+        <!-- Pedido -->
+        <div class="ship-tile" style="flex:1; padding:8px 6px;">
+          <div class="tile-icon-wrap">
+            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="20" height="26" rx="2" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+              <path d="M18 4v7h6" fill="none" stroke="#2D7A5F" stroke-width="1.4"/>
+              <path d="M18 4l6 7" fill="none" stroke="#2D7A5F" stroke-width="1.4"/>
+              <line x1="7" y1="15" x2="19" y2="15" stroke="#5BAD90" stroke-width="1.1"/>
+              <line x1="7" y1="19" x2="19" y2="19" stroke="#5BAD90" stroke-width="1.1"/>
+              <circle cx="22" cy="28" r="6" fill="#C6F0E4" stroke="#2D7A5F" stroke-width="1.3"/>
+              <path d="M19 28 L21.5 30.5 L25.5 25" fill="none" stroke="#2D7A5F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="tile-icon-label">Pedido</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="section-label">Planes de Mantenimiento / Inventarios por Barco</div>
+      <div class="erp-top-split">
+
+        <!-- Left: inventory DBs using same ship-tile structure as MARAD for height alignment -->
+        <div class="erp-left-col">
+
+          <div class="ship-tile">
+            <div class="tile-icon-wrap">
+              <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+                <rect x="3" y="8" width="28" height="20" fill="#EBF6F2" stroke="none"/>
+                <line x1="3" y1="8" x2="3" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <line x1="31" y1="8" x2="31" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="28" rx="14" ry="5" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+              </svg>
+              <span class="tile-icon-label">Inventario<br>Barco 1</span>
+            </div>
+          </div>
+
+          <div class="tiles-ellipsis">···</div>
+
+          <div class="ship-tile">
+            <div class="tile-icon-wrap">
+              <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+                <rect x="3" y="8" width="28" height="20" fill="#EBF6F2" stroke="none"/>
+                <line x1="3" y1="8" x2="3" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <line x1="31" y1="8" x2="31" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="28" rx="14" ry="5" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+              </svg>
+              <span class="tile-icon-label">Inventario<br>Barco N</span>
+            </div>
+          </div>
+
+          <div class="ship-tile">
+            <div class="tile-icon-wrap">
+              <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+                <rect x="3" y="8" width="28" height="20" fill="#EBF6F2" stroke="none"/>
+                <line x1="3" y1="8" x2="3" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <line x1="31" y1="8" x2="31" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="28" rx="14" ry="5" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
+                <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+              </svg>
+              <span class="tile-icon-label">Inventario<br>Terminal MOTI</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="erp-vert-divider"></div>
+
+        <!-- Right: Almacén Central -->
+        <div class="erp-right-col" id="erpAlmacenCol">
+          <svg width="72" height="80" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+            <rect x="3" y="8" width="28" height="20" fill="#EBF6F2" stroke="none"/>
+            <line x1="3" y1="8" x2="3" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+            <line x1="31" y1="8" x2="31" y2="28" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="17" cy="28" rx="14" ry="5" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+          </svg>
+          <span class="tile-icon-label" style="font-size:0.72rem; font-weight:700; color:#1A5040;">Almacén<br>Central</span>
+        </div>
+
+        <svg id="connectorSvgErpTop" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrowGreenLeft" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+              <polygon points="0 0, 7 2.5, 0 5" fill="#2D7A5F" opacity="0.8"/>
+            </marker>
+          </defs>
+        </svg>
+
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="section-label">Biblioteca de Artículos / Mapeo</div>
+      <div class="bottom-section">
+
+        <div class="biblioteca-db core-highlight">
+          <svg width="68" height="78" viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="19" cy="9" rx="16" ry="6" fill="#D4EEE6" stroke="#2D7A5F" stroke-width="1.5"/>
+            <rect x="3" y="9" width="32" height="24" fill="#D4EEE6" stroke="none"/>
+            <line x1="3" y1="9" x2="3" y2="33" stroke="#2D7A5F" stroke-width="1.5"/>
+            <line x1="35" y1="9" x2="35" y2="33" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="19" cy="33" rx="16" ry="6" fill="#B0E0D0" stroke="#2D7A5F" stroke-width="1.5"/>
+            <ellipse cx="19" cy="19" rx="16" ry="6" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+          </svg>
+          <span class="tile-icon-label">Biblioteca de<br>Artículos</span>
+        </div>
+
+        <div class="tile-arrow" style="font-size:1.4rem; color:#2D7A5F; align-self:center;">→</div>
+
+        <div class="mapeo-wrap">
+          <div class="mapeo-title">Mapeo Biblioteca – Barco</div>
+          <div class="table-scroll">
+            <table class="mapeo-table">
+              <thead>
+                <tr>
+                  <th class="comp-header">Artículo</th>
+                  <th class="connector-col">B1</th>
+                  <th class="connector-col">BN</th>
+                  <th class="connector-col">MOTI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="comp-cell">Motores Principales</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. de Navegación</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell empty">○</td>
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. Hidráulicos</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell empty">○</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Equipos de Cubierta</td>
+                  <td class="dot-cell empty">○</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Sist. Eléctricos</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell filled">●</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <svg id="connectorSvgErp" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrowGreen" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+            <polygon points="0 0, 7 2.5, 0 5" fill="#2D7A5F" opacity="0.75"/>
+          </marker>
+        </defs>
+      </svg>
+
+    </div>
+  </div>
+
+  <!-- Proveedores entity -->
+  <div class="prov-entity" id="provEntity" style="align-self: center; margin: 0 20px; padding: 24px 20px; gap: 12px;">
+    <svg width="44" height="48" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="5" width="28" height="3.5" rx="1" fill="#C05621"/>
+      <rect x="4" y="8" width="24" height="24" rx="1" fill="#FFF7ED" stroke="#C05621" stroke-width="1.5"/>
+      <rect x="7"  y="12" width="5" height="5" rx="0.5" fill="#FBD38D" stroke="#C05621" stroke-width="0.8"/>
+      <rect x="14" y="12" width="5" height="5" rx="0.5" fill="#FBD38D" stroke="#C05621" stroke-width="0.8"/>
+      <rect x="21" y="12" width="5" height="5" rx="0.5" fill="#FBD38D" stroke="#C05621" stroke-width="0.8"/>
+      <rect x="7"  y="20" width="5" height="5" rx="0.5" fill="#FBD38D" stroke="#C05621" stroke-width="0.8"/>
+      <rect x="21" y="20" width="5" height="5" rx="0.5" fill="#FBD38D" stroke="#C05621" stroke-width="0.8"/>
+      <rect x="13" y="22" width="7" height="10" rx="0.5" fill="#FEEBC8" stroke="#C05621" stroke-width="0.8"/>
+    </svg>
+    <span class="tile-icon-label">Proveedores</span>
+  </div>
+
+  <div id="zoomHotspot" onclick="openZoomModal()" title="Ver detalle: Integración Inventario Barco 1"></div>
+  <div id="maradPlanHotspot" onclick="openPlanModal()" title="Ver estructura interna del Plan de Mantenimiento"></div>
+  <div id="solicitudHotspot" onclick="openSolicitudModal()" title="Ver actualización de estados"></div>
+
+  <svg id="connectorSvgCross" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowCrossBlue"  markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#3B6EA5" opacity="0.9"/>
+      </marker>
+      <marker id="arrowCrossRed"   markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#E53E3E" opacity="0.9"/>
+      </marker>
+      <marker id="arrowCrossBlack" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#2D3748" opacity="0.9"/>
+      </marker>
+      <marker id="arrowCrossSync" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#6B46C1" opacity="0.9"/>
+      </marker>
+      <marker id="arrowCrossOrange" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#C05621" opacity="0.9"/>
+      </marker>
+    </defs>
+  </svg>
+
+</div>
+
+<!-- ── Plan de Mantenimiento tree modal ── -->
+<div id="maradPlanModal" onclick="if(event.target===this)closePlanModal()">
+  <div class="zm-box">
+    <button class="zm-close" onclick="closePlanModal()">×</button>
+    <div class="zm-eyebrow">Estructura Interna — MARAD</div>
+    <div class="zm-title">Árbol del Plan de Mantenimiento</div>
+
+    <svg viewBox="0 0 660 200" width="100%" style="display:block; margin-bottom:16px;">
+      <defs>
+        <marker id="pmArr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#C05621"/>
+        </marker>
+        <marker id="pmArrGray" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,6 2.5,0 5" fill="#A0AEC0"/>
+        </marker>
+        <marker id="pmArrSlate" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,6 2.5,0 5" fill="#CBD5E0"/>
+        </marker>
+      </defs>
+
+      <!-- ── Column headers ── -->
+      <text x="21"  y="14" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">PLAN</text>
+      <text x="128" y="14" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">PARTE</text>
+      <text x="246" y="14" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">SUB-PARTE</text>
+      <text x="368" y="14" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">JOB</text>
+      <text x="516" y="14" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">RESULTADO</text>
+      <line x1="8" y1="19" x2="652" y2="19" stroke="#EDF2F7" stroke-width="1"/>
+
+      <!-- ── File icon (Plan de Mantenimiento) ── -->
+      <g transform="translate(8,79)">
+        <rect x="2" y="2" width="22" height="28" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+        <path d="M18 2v8h8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+        <path d="M24 2l6 8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
+        <line x1="6" y1="16" x2="20" y2="16" stroke="#7AAAD4" stroke-width="1.2"/>
+        <line x1="6" y1="20" x2="20" y2="20" stroke="#7AAAD4" stroke-width="1.2"/>
+        <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
+      </g>
+      <text x="21" y="123" text-anchor="middle" font-size="8" fill="#3B6EA5" font-weight="700" font-family="Segoe UI,sans-serif">Plan de</text>
+      <text x="21" y="132" text-anchor="middle" font-size="8" fill="#3B6EA5" font-family="Segoe UI,sans-serif">Mantenimiento</text>
+
+      <!-- ── Trunk and branch ── -->
+      <line x1="40" y1="95" x2="62" y2="95" stroke="#A0AEC0" stroke-width="1.5"/>
+      <line x1="62" y1="63" x2="62" y2="143" stroke="#A0AEC0" stroke-width="1.5"/>
+      <line x1="62" y1="63"  x2="88" y2="63"  stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+      <line x1="62" y1="143" x2="88" y2="143" stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+
+      <!-- ── Parte A ── -->
+      <rect x="88" y="49" width="80" height="28" rx="4" fill="#EEF4FF" stroke="#3B6EA5" stroke-width="1"/>
+      <text x="128" y="66" text-anchor="middle" font-size="9" fill="#1E3A6A" font-weight="700" font-family="Segoe UI,sans-serif">Parte</text>
+      <text x="128" y="89" text-anchor="middle" font-size="7.5" fill="#718096" font-style="italic" font-family="Segoe UI,sans-serif">ej. Sist. Propulsión</text>
+
+      <!-- ── Parte B ── -->
+      <rect x="88" y="129" width="80" height="28" rx="4" fill="#EEF4FF" stroke="#3B6EA5" stroke-width="1"/>
+      <text x="128" y="146" text-anchor="middle" font-size="9" fill="#1E3A6A" font-weight="700" font-family="Segoe UI,sans-serif">Parte</text>
+      <text x="128" y="169" text-anchor="middle" font-size="7.5" fill="#718096" font-style="italic" font-family="Segoe UI,sans-serif">ej. Sist. Eléctrico</text>
+
+      <!-- ── Parte → Sub-Parte lines ── -->
+      <line x1="168" y1="63"  x2="200" y2="63"  stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+      <line x1="168" y1="143" x2="200" y2="143" stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+
+      <!-- ── Sub-Parte A ── -->
+      <rect x="200" y="49" width="92" height="28" rx="4" fill="#E8F4FF" stroke="#5A7FB5" stroke-width="1"/>
+      <text x="246" y="66" text-anchor="middle" font-size="9" fill="#1E3A6A" font-weight="700" font-family="Segoe UI,sans-serif">Sub-Parte</text>
+      <text x="246" y="89" text-anchor="middle" font-size="7.5" fill="#718096" font-style="italic" font-family="Segoe UI,sans-serif">ej. Motor Principal</text>
+
+      <!-- ── Sub-Parte B ── -->
+      <rect x="200" y="129" width="92" height="28" rx="4" fill="#E8F4FF" stroke="#5A7FB5" stroke-width="1"/>
+      <text x="246" y="146" text-anchor="middle" font-size="9" fill="#1E3A6A" font-weight="700" font-family="Segoe UI,sans-serif">Sub-Parte</text>
+      <text x="246" y="169" text-anchor="middle" font-size="7.5" fill="#718096" font-style="italic" font-family="Segoe UI,sans-serif">ej. Panel Control</text>
+
+      <!-- ── Sub-Parte → Job lines ── -->
+      <line x1="292" y1="63"  x2="334" y2="63"  stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+      <line x1="292" y1="143" x2="334" y2="143" stroke="#A0AEC0" stroke-width="1.5" marker-end="url(#pmArrGray)"/>
+
+      <!-- ── Job A — afecta inventario (amber) ── -->
+      <rect x="334" y="49" width="68" height="28" rx="4" fill="#FFFBEB" stroke="#D69E2E" stroke-width="1.5"/>
+      <text x="368" y="64" text-anchor="middle" font-size="9" fill="#744210" font-weight="700" font-family="Segoe UI,sans-serif">Job</text>
+      <text x="368" y="75" text-anchor="middle" font-size="7" fill="#D69E2E" font-weight="600" font-family="Segoe UI,sans-serif">▸ inventario</text>
+      <text x="368" y="91" text-anchor="middle" font-size="7.5" fill="#718096" font-style="italic" font-family="Segoe UI,sans-serif">ej. Cambio de Filtros</text>
+
+      <!-- ── Job B — sin inventario (slate) ── -->
+      <rect x="334" y="129" width="68" height="28" rx="4" fill="#F7FAFC" stroke="#CBD5E0" stroke-width="1.5"/>
+      <text x="368" y="144" text-anchor="middle" font-size="9" fill="#718096" font-weight="700" font-family="Segoe UI,sans-serif">Job</text>
+      <text x="368" y="155" text-anchor="middle" font-size="7" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">sin consumo</text>
+      <text x="368" y="171" text-anchor="middle" font-size="7.5" fill="#A0AEC0" font-style="italic" font-family="Segoe UI,sans-serif">ej. Inspección Visual</text>
+
+      <!-- ── Job A → DB (consume elbow, orange) ── -->
+      <path d="M 402 63 L 446 63 L 446 86 L 492 86" fill="none" stroke="#C05621" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#pmArr)"/>
+      <text x="424" y="57" text-anchor="middle" font-size="8" fill="#C05621" font-style="italic" font-family="Segoe UI,sans-serif">consume</text>
+
+      <!-- ── Job B → "Sin consumo" endpoint (gray dashed) ── -->
+      <line x1="402" y1="143" x2="432" y2="143" stroke="#CBD5E0" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#pmArrSlate)"/>
+      <rect x="432" y="129" width="118" height="28" rx="4" fill="#F7FAFC" stroke="#CBD5E0" stroke-width="1" stroke-dasharray="4 3"/>
+      <!-- ⊘ symbol -->
+      <circle cx="450" cy="143" r="7" fill="none" stroke="#CBD5E0" stroke-width="1.5"/>
+      <line x1="445" y1="148" x2="455" y2="138" stroke="#CBD5E0" stroke-width="1.5"/>
+      <text x="487" y="140" text-anchor="middle" font-size="8" fill="#A0AEC0" font-weight="600" font-family="Segoe UI,sans-serif">Sin consumo</text>
+      <text x="487" y="151" text-anchor="middle" font-size="8" fill="#A0AEC0" font-family="Segoe UI,sans-serif">de inventario</text>
+
+      <!-- ── DB Inventario Barco N ── -->
+      <g transform="translate(492,56)">
+        <ellipse cx="24" cy="10" rx="24" ry="10" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+        <rect x="0" y="10" width="48" height="36" fill="#EBF2FF"/>
+        <line x1="0"  y1="10" x2="0"  y2="46" stroke="#3B6EA5" stroke-width="1.5"/>
+        <line x1="48" y1="10" x2="48" y2="46" stroke="#3B6EA5" stroke-width="1.5"/>
+        <ellipse cx="24" cy="46" rx="24" ry="10" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
+        <ellipse cx="24" cy="26" rx="24" ry="10" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
+      </g>
+      <text x="516" y="120" text-anchor="middle" font-size="9" fill="#3B6EA5" font-weight="700" font-family="Segoe UI,sans-serif">Inventario</text>
+      <text x="516" y="131" text-anchor="middle" font-size="8" fill="#7AAAD4" font-family="Segoe UI,sans-serif">Barco N</text>
+    </svg>
+
+    <!-- Legend -->
+    <div style="display:flex; gap:20px; font-size:0.78rem; color:#718096; margin:0; flex-wrap:wrap;">
+      <div><span style="display:inline-block; width:12px; height:12px; background:#FFFBEB; border:1.5px solid #D69E2E; border-radius:2px; vertical-align:middle; margin-right:5px;"></span><strong style="color:#744210;">Job con inventario</strong> — descuenta piezas/repuestos del barco al ejecutarse.</div>
+      <div><span style="display:inline-block; width:12px; height:12px; background:#F7FAFC; border:1.5px solid #CBD5E0; border-radius:2px; vertical-align:middle; margin-right:5px;"></span><strong style="color:#718096;">Job sin consumo</strong> — inspecciones, revisiones o ajustes que no requieren materiales.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Solicitud status modal ── -->
+<div id="solicitudModal" onclick="if(event.target===this)closeSolicitudModal()">
+  <div class="zm-box">
+    <button class="zm-close" onclick="closeSolicitudModal()">×</button>
+    <div class="zm-eyebrow">Integración MARAD ↔ ERP</div>
+    <div class="zm-title">Actualización de Estado — Solicitud de Materiales</div>
+
+    <div class="sol-status-flow">
+
+      <div class="sol-status-step">
+        <div class="sol-status-icon" style="background:#EBF2FF; border-color:#3B6EA5;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="3" width="14" height="18" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+            <line x1="7" y1="8"  x2="15" y2="8"  stroke="#7AAAD4" stroke-width="1.2"/>
+            <line x1="7" y1="11" x2="15" y2="11" stroke="#7AAAD4" stroke-width="1.2"/>
+            <line x1="7" y1="14" x2="11" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <span class="sol-status-label">Pedido</span>
+        <span class="sol-status-desc">Solicitud creada y enviada al ERP</span>
+      </div>
+
+      <div class="sol-status-connector"></div>
+
+      <div class="sol-status-step">
+        <div class="sol-status-icon" style="background:#FFFBEB; border-color:#D97706;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="3" width="14" height="18" rx="2" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+            <text x="11" y="15" text-anchor="middle" font-size="9" fill="#D97706" font-weight="700" font-family="sans-serif">$</text>
+            <line x1="7" y1="8"  x2="15" y2="8"  stroke="#F6AD55" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <span class="sol-status-label">Cotización</span>
+        <span class="sol-status-desc">Proveedor responde con precios y plazos</span>
+      </div>
+
+      <div class="sol-status-connector"></div>
+
+      <div class="sol-status-step">
+        <div class="sol-status-icon" style="background:#EBF6F2; border-color:#2D7A5F;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="10" width="16" height="10" rx="1.5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+            <path d="M4 10V7a4 4 0 018 0v3" stroke="#2D7A5F" stroke-width="1.5" fill="none"/>
+            <circle cx="18" cy="16" r="4" fill="#C6F0E4" stroke="#2D7A5F" stroke-width="1.3"/>
+            <path d="M16 16l1.5 1.5L20 14" stroke="#2D7A5F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="sol-status-label">Despacho</span>
+        <span class="sol-status-desc">Orden confirmada y material en tránsito</span>
+      </div>
+
+      <div class="sol-status-connector"></div>
+
+      <div class="sol-status-step">
+        <div class="sol-status-icon" style="background:#F0FFF4; border-color:#276749;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" fill="#F0FFF4" stroke="#276749" stroke-width="1.5"/>
+            <path d="M8 12l3 3 5-6" stroke="#276749" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="sol-status-label">Recibido</span>
+        <span class="sol-status-desc">Material ingresado al inventario del barco</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Zoom detail modal ── -->
+<div id="zoomModal" onclick="if(event.target===this)closeZoomModal()">
+  <div id="zoomModalBox">
+    <button class="zm-close" onclick="closeZoomModal()">×</button>
+    <div class="zm-eyebrow">Detalle de Integración</div>
+    <div class="zm-title">Inventario Barco 1 — MARAD ↔ ERP</div>
+
+    <svg viewBox="0 0 540 170" width="100%" style="display:block;">
+      <defs>
+        <marker id="zmBlue"  markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#3B6EA5"/></marker>
+        <marker id="zmRed"   markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#E53E3E"/></marker>
+        <marker id="zmBlack" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#2D3748"/></marker>
+      </defs>
+
+      <!-- MARAD DB cylinder -->
+      <g transform="translate(20,44)">
+        <ellipse cx="40" cy="13" rx="40" ry="13" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
+        <rect x="0" y="13" width="80" height="52" fill="#EBF2FF"/>
+        <line x1="0"  y1="13" x2="0"  y2="65" stroke="#3B6EA5" stroke-width="1.5"/>
+        <line x1="80" y1="13" x2="80" y2="65" stroke="#3B6EA5" stroke-width="1.5"/>
+        <ellipse cx="40" cy="65" rx="40" ry="13" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
+        <ellipse cx="40" cy="32" rx="40" ry="13" fill="none"    stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
+      </g>
+      <text x="60" y="135" text-anchor="middle" font-size="10" fill="#3B6EA5" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
+      <text x="60" y="148" text-anchor="middle" font-size="9"  fill="#7AAAD4" font-family="Segoe UI,sans-serif">MARAD</text>
+
+      <!-- ERP DB cylinder -->
+      <g transform="translate(440,44)">
+        <ellipse cx="40" cy="13" rx="40" ry="13" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
+        <rect x="0" y="13" width="80" height="52" fill="#EBF6F2"/>
+        <line x1="0"  y1="13" x2="0"  y2="65" stroke="#2D7A5F" stroke-width="1.5"/>
+        <line x1="80" y1="13" x2="80" y2="65" stroke="#2D7A5F" stroke-width="1.5"/>
+        <ellipse cx="40" cy="65" rx="40" ry="13" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
+        <ellipse cx="40" cy="32" rx="40" ry="13" fill="none"    stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
+      </g>
+      <text x="480" y="135" text-anchor="middle" font-size="10" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
+      <text x="480" y="148" text-anchor="middle" font-size="9"  fill="#5BAD90" font-family="Segoe UI,sans-serif">ERP</text>
+
+      <!-- Arrow 1 — blue "+"  (ERP → MARAD) -->
+      <line x1="440" y1="75" x2="100" y2="75" stroke="#3B6EA5" stroke-width="2" marker-end="url(#zmBlue)"/>
+      <rect x="228" y="62" width="84" height="16" rx="4" fill="#EBF2FF"/>
+      <text x="270" y="74" text-anchor="middle" font-size="11" fill="#3B6EA5" font-weight="800" font-family="Segoe UI,sans-serif">+  Entrada</text>
+
+      <!-- Arrow 2 — red "−"  MARAD → ERP -->
+      <line x1="100" y1="97" x2="440" y2="97" stroke="#E53E3E" stroke-width="2" marker-end="url(#zmRed)"/>
+      <rect x="220" y="84" width="100" height="16" rx="4" fill="#FFF5F5"/>
+      <text x="270" y="96" text-anchor="middle" font-size="11" fill="#E53E3E" font-weight="800" font-family="Segoe UI,sans-serif">−  Salida</text>
+
+      <!-- Arrow 3 — dark "Ajustes Inventarios" -->
+      <line x1="440" y1="119" x2="100" y2="119" stroke="#2D3748" stroke-width="2" marker-end="url(#zmBlack)"/>
+      <rect x="188" y="106" width="164" height="16" rx="4" fill="#EDF2F7"/>
+      <text x="270" y="118" text-anchor="middle" font-size="10" fill="#2D3748" font-weight="700" font-family="Segoe UI,sans-serif">Ajustes Inventarios</text>
+    </svg>
+
+    <table class="zm-legend">
+      <thead>
+        <tr><th>Flujo</th><th>Descripción</th><th>Dirección</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span style="color:#3B6EA5;font-weight:700;">+ Entrada</span></td>
+          <td>Suma de cantidades al inventario del barco</td>
+          <td style="color:#718096;">ERP → MARAD</td>
+        </tr>
+        <tr>
+          <td><span style="color:#E53E3E;font-weight:700;">− Salida</span></td>
+          <td>Resta de cantidades del inventario del barco</td>
+          <td style="color:#718096;">MARAD → ERP</td>
+        </tr>
+        <tr>
+          <td><span style="color:#2D3748;font-weight:700;">Ajustes</span></td>
+          <td>Corrección de cantidades sin movimiento de entrada/salida</td>
+          <td style="color:#718096;">ERP → MARAD</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function drawConnectors(svgId, bodyEl, stroke, markerUrl) {
+  var svg = document.getElementById(svgId);
+  if (!svg || !bodyEl) return;
+
+  Array.from(svg.querySelectorAll('line, path, circle')).forEach(function(el) { el.remove(); });
+
+  var bodyRect = bodyEl.getBoundingClientRect();
+
+  var dbCenters = [];
+  bodyEl.querySelectorAll('.ship-tile').forEach(function(tile) {
+    var wraps = tile.querySelectorAll('.tile-icon-wrap');
+    if (wraps.length >= 3) {
+      var r = wraps[2].getBoundingClientRect();
+      dbCenters.push({
+        x: r.left + r.width / 2 - bodyRect.left,
+        y: r.top + r.height / 2 - bodyRect.top
+      });
+    }
+  });
+
+  if (dbCenters.length === 0) return;
+
+  var mapeo = bodyEl.querySelector('.mapeo-wrap');
+  if (!mapeo) return;
+  var mr = mapeo.getBoundingClientRect();
+  var startX = mr.left + mr.width / 2 - bodyRect.left;
+  var startY = mr.top - bodyRect.top;
+
+  var lineX = dbCenters[dbCenters.length - 1].x;
+  var topDB  = dbCenters[0];
+
+  var d = 'M ' + startX.toFixed(1) + ' ' + startY.toFixed(1)
+        + ' L ' + lineX.toFixed(1)  + ' ' + startY.toFixed(1)
+        + ' L ' + lineX.toFixed(1)  + ' ' + (topDB.y - 14).toFixed(1);
+
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', stroke);
+  path.setAttribute('stroke-width', '1.8');
+  path.setAttribute('stroke-dasharray', '5 3');
+  path.setAttribute('marker-end', 'url(' + markerUrl + ')');
+  path.setAttribute('opacity', '0.7');
+  svg.appendChild(path);
+
+  dbCenters.forEach(function(db) {
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', lineX.toFixed(1));
+    dot.setAttribute('cy', db.y.toFixed(1));
+    dot.setAttribute('r', '4.5');
+    dot.setAttribute('fill', stroke);
+    dot.setAttribute('opacity', '0.75');
+    svg.appendChild(dot);
+  });
+}
+
+function drawErpTopArrows() {
+  var svg = document.getElementById('connectorSvgErpTop');
+  var container = document.querySelector('.erp-top-split');
+  if (!svg || !container) return;
+
+  Array.from(svg.querySelectorAll('line')).forEach(function(el) { el.remove(); });
+
+  var cr = container.getBoundingClientRect();
+
+  // Source: center of the Almacén Central DB icon
+  var almacen = document.getElementById('erpAlmacenCol');
+  if (!almacen) return;
+  var almacenIcon = almacen.querySelector('svg');
+  if (!almacenIcon) return;
+  var ar = almacenIcon.getBoundingClientRect();
+  var srcX = ar.left + ar.width / 2 - cr.left;
+  var srcY = ar.top + ar.height / 2 - cr.top;
+
+  // Target: right edge of each inventory ship-tile, vertically centered
+  container.querySelectorAll('.erp-left-col .ship-tile').forEach(function(box) {
+    var br = box.getBoundingClientRect();
+    var endX = br.right - cr.left;
+    var endY = br.top + br.height / 2 - cr.top;
+
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', srcX.toFixed(1));
+    line.setAttribute('y1', srcY.toFixed(1));
+    line.setAttribute('x2', endX.toFixed(1));
+    line.setAttribute('y2', endY.toFixed(1));
+    line.setAttribute('stroke', '#2D7A5F');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-dasharray', '4 3');
+    line.setAttribute('marker-end', 'url(#arrowGreenLeft)');
+    line.setAttribute('opacity', '0.65');
+    svg.appendChild(line);
+  });
+}
+
+function drawErpCentralToMatrix() {
+  var svg = document.getElementById('connectorSvgErp');
+  var body = document.getElementById('erpBody');
+  if (!svg || !body) return;
+
+  Array.from(svg.querySelectorAll('line, path')).forEach(function(el) { el.remove(); });
+
+  var br = body.getBoundingClientRect();
+
+  // Source: bottom-center of Almacén Central icon
+  var almacenIcon = document.querySelector('#erpAlmacenCol svg');
+  if (!almacenIcon) return;
+  var ar = almacenIcon.getBoundingClientRect();
+  var srcX = ar.left + ar.width / 2 - br.left;
+  var srcY = ar.bottom - br.top;
+
+  // Target: top of the mapeo-wrap table in ERP bottom section
+  var mapeo = document.querySelector('#erpBody .mapeo-wrap');
+  if (!mapeo) return;
+  var mr = mapeo.getBoundingClientRect();
+  var endX = mr.left + mr.width / 2 - br.left;
+  var endY = mr.top - br.top;
+
+  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', srcX.toFixed(1));
+  line.setAttribute('y1', srcY.toFixed(1));
+  line.setAttribute('x2', endX.toFixed(1));
+  line.setAttribute('y2', endY.toFixed(1));
+  line.setAttribute('stroke', '#2D7A5F');
+  line.setAttribute('stroke-width', '1.5');
+  line.setAttribute('stroke-dasharray', '4 3');
+  line.setAttribute('marker-end', 'url(#arrowGreen)');
+  line.setAttribute('opacity', '0.7');
+  svg.appendChild(line);
+}
+
+function drawCrossBlockLines() {
+  var svg = document.getElementById('connectorSvgCross');
+  var canvas = document.querySelector('.canvas');
+  if (!svg || !canvas) return;
+
+  Array.from(svg.querySelectorAll('line, text')).forEach(function(el) { el.remove(); });
+
+  var cr = canvas.getBoundingClientRect();
+
+  // MARAD Barco 1 DB center
+  var maradTile = document.querySelector('#maradBody .marad-top-wrap .ship-tile');
+  if (!maradTile) return;
+  var maradDbWrap = maradTile.querySelectorAll('.tile-icon-wrap')[2];
+  if (!maradDbWrap) return;
+  var maradIcon = maradDbWrap.querySelector('svg');
+  if (!maradIcon) return;
+  var mi = maradIcon.getBoundingClientRect();
+  var maradX = mi.left + mi.width / 2 - cr.left;
+  var maradY = mi.top + mi.height / 2 - cr.top;
+
+  // ERP Barco 1 DB center
+  var erpBox = document.querySelector('#erpBody .erp-left-col .ship-tile');
+  if (!erpBox) return;
+  var erpIcon = erpBox.querySelector('svg');
+  if (!erpIcon) return;
+  var ei = erpIcon.getBoundingClientRect();
+  var erpX = ei.left + ei.width / 2 - cr.left;
+  var erpY = ei.top + ei.height / 2 - cr.top;
+
+  var configs = [
+    { offset: -22, color: '#3B6EA5', marker: 'arrowCrossBlue',  label: '+',                   fromErp: true  },
+    { offset:   0, color: '#E53E3E', marker: 'arrowCrossRed',   label: '−',                   fromErp: false },
+    { offset:  22, color: '#2D3748', marker: 'arrowCrossBlack', label: 'Ajustes Inventarios', fromErp: true  }
+  ];
+
+  configs.forEach(function(cfg) {
+    var x1 = cfg.fromErp ? erpX   : maradX,  y1 = (cfg.fromErp ? erpY   : maradY) + cfg.offset;
+    var x2 = cfg.fromErp ? maradX : erpX,    y2 = (cfg.fromErp ? maradY : erpY)   + cfg.offset;
+
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1.toFixed(1));
+    line.setAttribute('y1', y1.toFixed(1));
+    line.setAttribute('x2', x2.toFixed(1));
+    line.setAttribute('y2', y2.toFixed(1));
+    line.setAttribute('stroke', cfg.color);
+    line.setAttribute('stroke-width', '2.5');
+    line.setAttribute('stroke-dasharray', '6 3');
+    line.setAttribute('marker-end', 'url(#' + cfg.marker + ')');
+    line.setAttribute('opacity', '0.9');
+    svg.appendChild(line);
+
+    // Label above the midpoint of each line
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', ((x1 + x2) / 2).toFixed(1));
+    text.setAttribute('y', ((y1 + y2) / 2 - 7).toFixed(1));
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', cfg.color);
+    text.setAttribute('font-size', '12');
+    text.setAttribute('font-weight', '700');
+    text.setAttribute('font-family', 'Segoe UI, system-ui, sans-serif');
+    text.textContent = cfg.label;
+    svg.appendChild(text);
+  });
+}
+
+function drawSyncLines() {
+  var svg = document.getElementById('connectorSvgCross');
+  var canvas = document.querySelector('.canvas');
+  if (!svg || !canvas) return;
+
+  Array.from(svg.querySelectorAll('[data-sync]')).forEach(function(el) { el.remove(); });
+
+  var cr = canvas.getBoundingClientRect();
+  var baseY = cr.height + 28;   // base routing Y, just below the canvas
+
+  function makeSyncLine(srcEl, dstEl, label, extraY) {
+    if (!srcEl || !dstEl) return;
+    var sr = srcEl.getBoundingClientRect();
+    var dr = dstEl.getBoundingClientRect();
+
+    // Start from bottom-center of ERP element, end at bottom-center of MARAD element
+    var x1 = sr.left + sr.width  / 2 - cr.left;
+    var y1 = sr.bottom - cr.top;
+    var x2 = dr.left + dr.width  / 2 - cr.left;
+    var y2 = dr.bottom - cr.top;
+    var ry = baseY + (extraY || 0);   // horizontal routing rail
+
+    // U-shaped path: down → across → up
+    var d = 'M '  + x1.toFixed(1) + ' ' + y1.toFixed(1)
+          + ' L ' + x1.toFixed(1) + ' ' + ry.toFixed(1)
+          + ' L ' + x2.toFixed(1) + ' ' + ry.toFixed(1)
+          + ' L ' + x2.toFixed(1) + ' ' + y2.toFixed(1);
+
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#6B46C1');
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('stroke-dasharray', '6 3');
+    path.setAttribute('marker-end', 'url(#arrowCrossSync)');
+    path.setAttribute('opacity', '0.8');
+    path.setAttribute('data-sync', '1');
+    svg.appendChild(path);
+
+    // Label below the horizontal rail
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', ((x1 + x2) / 2).toFixed(1));
+    text.setAttribute('y', (ry + 11).toFixed(1));
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', '#6B46C1');
+    text.setAttribute('font-size', '11');
+    text.setAttribute('font-weight', '700');
+    text.setAttribute('font-family', 'Segoe UI, system-ui, sans-serif');
+    text.setAttribute('data-sync', '1');
+    text.textContent = label;
+    svg.appendChild(text);
+  }
+
+  // Biblioteca ERP → Biblioteca MARAD
+  makeSyncLine(
+    document.querySelector('#erpBody  .biblioteca-db svg'),
+    document.querySelector('#maradBody .biblioteca-db svg'),
+    'Sincronización', 0
+  );
+
+  // Matrix ERP → Matrix MARAD  (offset rail so paths don't overlap)
+  makeSyncLine(
+    document.querySelector('#erpBody  .mapeo-table'),
+    document.querySelector('#maradBody .mapeo-table'),
+    'Sincronización', 22
+  );
+}
+
+function placePlanHotspot() {
+  var canvas  = document.querySelector('.canvas');
+  var hotspot = document.getElementById('maradPlanHotspot');
+  if (!canvas || !hotspot) return;
+
+  var cr = canvas.getBoundingClientRect();
+  var firstTile = document.querySelector('#maradBody .marad-top-wrap .ship-tile');
+  if (!firstTile) return;
+
+  var wraps = firstTile.querySelectorAll('.tile-icon-wrap');
+  if (wraps.length < 3) return;
+
+  var fw  = wraps[1].getBoundingClientRect(); // plan icon wrap
+  var dw  = wraps[2].getBoundingClientRect(); // DB icon wrap
+  var tr  = firstTile.getBoundingClientRect();
+  var pad = 10;
+
+  hotspot.style.left   = (fw.right - cr.left - pad) + 'px';
+  hotspot.style.top    = (tr.top - cr.top - pad) + 'px';
+  hotspot.style.width  = (dw.left - fw.right + pad * 2) + 'px';
+  hotspot.style.height = (tr.height + pad * 2) + 'px';
+}
+
+function openPlanModal()  { document.getElementById('maradPlanModal').style.display = 'flex'; }
+function closePlanModal() { document.getElementById('maradPlanModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeZoomModal(); closePlanModal(); closeSolicitudModal(); }
+});
+
+function placeZoomHotspot() {
+  var canvas  = document.querySelector('.canvas');
+  var hotspot = document.getElementById('zoomHotspot');
+  if (!canvas || !hotspot) return;
+
+  var cr = canvas.getBoundingClientRect();
+
+  // MARAD Barco 1 DB: third icon-wrap svg (index 2) in the first ship-tile
+  var maradTile  = document.querySelector('#maradBody .marad-top-wrap .ship-tile');
+  var maradWraps = maradTile ? maradTile.querySelectorAll('.tile-icon-wrap') : [];
+  var maradIcon  = maradWraps.length > 2 ? maradWraps[2].querySelector('svg') : null;
+
+  // ERP Barco 1: first ship-tile in erp-left-col
+  var erpTile = document.querySelector('#erpBody .erp-left-col .ship-tile');
+  var erpIcon = erpTile ? erpTile.querySelector('svg') : null;
+
+  if (!maradIcon || !erpIcon) return;
+
+  var mr  = maradIcon.getBoundingClientRect();
+  var er  = erpIcon.getBoundingClientRect();
+  var pad = 14;
+
+  hotspot.style.left   = (mr.right  - cr.left - pad) + 'px';
+  hotspot.style.top    = (Math.min(mr.top, er.top) - cr.top - pad) + 'px';
+  hotspot.style.width  = (er.left - mr.right + pad * 2) + 'px';
+  hotspot.style.height = (Math.max(mr.bottom, er.bottom) - Math.min(mr.top, er.top) + pad * 2) + 'px';
+}
+
+function placeSolicitudHotspot() {
+  var canvas   = document.querySelector('.canvas');
+  var hotspot  = document.getElementById('solicitudHotspot');
+  if (!canvas || !hotspot) return;
+  var cr = canvas.getBoundingClientRect();
+
+  // Span the gap between MARAD Solicitud right edge and ERP Req left edge
+  var maradSol = document.querySelector('#maradBody .compras-box .sol-col svg');
+  var erpReq   = document.querySelector('#erpBody .compras-box .tile-icon-wrap svg');
+  if (!maradSol || !erpReq) return;
+
+  var mr  = maradSol.getBoundingClientRect();
+  var er  = erpReq.getBoundingClientRect();
+  var pad = 8;
+
+  hotspot.style.left   = (mr.right  - cr.left - pad) + 'px';
+  hotspot.style.top    = (Math.min(mr.top, er.top) - cr.top - pad) + 'px';
+  hotspot.style.width  = (er.left - mr.right + pad * 2) + 'px';
+  hotspot.style.height = (Math.max(mr.bottom, er.bottom) - Math.min(mr.top, er.top) + pad * 2) + 'px';
+}
+
+function openSolicitudModal()  { document.getElementById('solicitudModal').style.display = 'flex'; }
+function closeSolicitudModal() { document.getElementById('solicitudModal').style.display = 'none'; }
+
+function openZoomModal() {
+  document.getElementById('zoomModal').style.display = 'flex';
+}
+function closeZoomModal() {
+  document.getElementById('zoomModal').style.display = 'none';
+}
+
+function drawComprasArrows() {
+  var svg  = document.getElementById('connectorSvg');
+  var body = document.getElementById('maradBody');
+  if (!svg || !body) return;
+
+  var br = body.getBoundingClientRect();
+
+  // Destination: center-x / bottom-y of the Solicitud de Materiales icon in compras-box
+  var solTile = body.querySelector('.compras-box .sol-col');
+  if (!solTile) return;
+  var solIcon = solTile.querySelector('svg');
+  if (!solIcon) return;
+  var sr   = solIcon.getBoundingClientRect();
+  var dstX = sr.left  - br.left;                   // left edge of compras Solicitud (arrowhead enters from left)
+  var dstY = sr.top + sr.height / 2 - br.top;     // center-y of compras Solicitud
+
+  // Sources: center of each in-tile Solicitud icon
+  body.querySelectorAll('.marad-top-wrap .ship-tile').forEach(function(tile) {
+    var wraps  = tile.querySelectorAll('.tile-icon-wrap');
+    if (wraps.length < 3) return;
+    var solIcon = wraps[0].querySelector('svg');
+    if (!solIcon) return;
+    var ir   = solIcon.getBoundingClientRect();
+    var srcX = ir.left + ir.width  / 2 - br.left;
+    var srcY = ir.top  + ir.height / 2 - br.top;
+
+    // L-shaped: straight UP to compras Solicitud level, then RIGHT into the icon
+    var d = 'M ' + srcX.toFixed(1) + ' ' + srcY.toFixed(1)
+          + ' L ' + srcX.toFixed(1) + ' ' + dstY.toFixed(1)
+          + ' L ' + dstX.toFixed(1) + ' ' + dstY.toFixed(1);
+
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#3B6EA5');
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('stroke-dasharray', '4 2');
+    path.setAttribute('marker-end', 'url(#arrowBlue)');
+    path.setAttribute('opacity', '0.75');
+    path.setAttribute('data-compras', '1');
+    svg.appendChild(path);
+  });
+}
+
+function drawComprasCrossLine() {
+  var svg    = document.getElementById('connectorSvgCross');
+  var canvas = document.querySelector('.canvas');
+  if (!svg || !canvas) return;
+
+  Array.from(svg.querySelectorAll('[data-compras-cross]')).forEach(function(el) { el.remove(); });
+
+  var cr = canvas.getBoundingClientRect();
+
+  // Source: right edge / center-y of MARAD Solicitud icon
+  var maradSol = document.querySelector('#maradBody .compras-box .sol-col svg');
+  if (!maradSol) return;
+  var mr = maradSol.getBoundingClientRect();
+
+  // Destination: left edge / center-y of ERP Req. de Materiales icon (first tile-icon-wrap in ERP compras-box)
+  var erpReq = document.querySelector('#erpBody .compras-box .tile-icon-wrap svg');
+  if (!erpReq) return;
+  var er = erpReq.getBoundingClientRect();
+
+  var x1 = mr.right  - cr.left;
+  var y1 = mr.top + mr.height / 2 - cr.top;
+  var x2 = er.left   - cr.left;
+  var y2 = er.top + er.height / 2 - cr.top;
+
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M ' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' L ' + x2.toFixed(1) + ' ' + y2.toFixed(1));
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#3B6EA5');
+  path.setAttribute('stroke-width', '2.5');
+  path.setAttribute('stroke-dasharray', '6 3');
+  path.setAttribute('marker-end', 'url(#arrowCrossBlue)');
+  path.setAttribute('data-compras-cross', '1');
+  svg.appendChild(path);
+
+  var midX = ((x1 + x2) / 2).toFixed(1);
+  var midY = (Math.min(y1, y2) - 5).toFixed(1);
+  var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  label.setAttribute('x', midX);
+  label.setAttribute('y', midY);
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('fill', '#3B6EA5');
+  label.setAttribute('font-size', '11');
+  label.setAttribute('font-weight', '600');
+  label.setAttribute('font-family', 'Segoe UI, system-ui, sans-serif');
+  label.setAttribute('data-compras-cross', '1');
+  label.textContent = 'Solicitud';
+  svg.appendChild(label);
+}
+
+function drawProvToErpLines() {
+  var svg    = document.getElementById('connectorSvgCross');
+  var canvas = document.querySelector('.canvas');
+  if (!svg || !canvas) return;
+
+  Array.from(svg.querySelectorAll('[data-prov-erp]')).forEach(function(el) { el.remove(); });
+
+  var cr   = canvas.getBoundingClientRect();
+  var prov = document.getElementById('provEntity');
+  if (!prov) return;
+  var pvr  = prov.getBoundingClientRect();
+  var srcX = pvr.left - cr.left;
+  var srcCY = pvr.top + pvr.height / 2 - cr.top;
+
+  function makeArrow(dstIcon, yOffset, cp1dy, cp2dy) {
+    if (!dstIcon) return;
+    var dr  = dstIcon.getBoundingClientRect();
+    var x1  = srcX,               y1 = srcCY + yOffset;
+    var x2  = dr.right - cr.left, y2 = dr.top + dr.height / 2 - cr.top;
+    var midX = (x1 + x2) / 2;
+    var d = 'M '  + x1.toFixed(1)              + ' ' + y1.toFixed(1)
+          + ' C ' + midX.toFixed(1)             + ' ' + (y1 + cp1dy).toFixed(1)
+          + ', '  + midX.toFixed(1)             + ' ' + (y2 + cp2dy).toFixed(1)
+          + ', '  + x2.toFixed(1)               + ' ' + y2.toFixed(1);
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#C05621');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '6 3');
+    path.setAttribute('marker-end', 'url(#arrowCrossOrange)');
+    path.setAttribute('data-prov-erp', '1');
+    svg.appendChild(path);
+  }
+
+  // Inventario Barco 1: arc upward to clear the Almacén Central region
+  makeArrow(document.querySelector('#erpBody .erp-left-col .ship-tile svg'), -18, -60, -60);
+  // Almacén Central: gentle S-curve through midpoint
+  makeArrow(document.querySelector('#erpAlmacenCol svg'),                     18,   0,   0);
+}
+
+function drawPedidoProvLine() {
+  var svg    = document.getElementById('connectorSvgCross');
+  var canvas = document.querySelector('.canvas');
+  if (!svg || !canvas) return;
+
+  Array.from(svg.querySelectorAll('[data-pedido-prov]')).forEach(function(el) { el.remove(); });
+
+  var cr = canvas.getBoundingClientRect();
+
+  // Source: right edge / center-y of the Pedido ship-tile icon
+  var pedidoTiles = document.querySelectorAll('#erpBody .compras-box .ship-tile');
+  var pedidoTile  = pedidoTiles[pedidoTiles.length - 1];
+  if (!pedidoTile) return;
+  var pedidoIcon = pedidoTile.querySelector('svg');
+  if (!pedidoIcon) return;
+  var pr = pedidoIcon.getBoundingClientRect();
+  var x1 = pr.right  - cr.left;
+  var y1 = pr.top + pr.height / 2 - cr.top;
+
+  // Destination: top-center of Proveedores entity
+  var prov = document.getElementById('provEntity');
+  if (!prov) return;
+  var pvr = prov.getBoundingClientRect();
+  var x2 = pvr.left + pvr.width / 2 - cr.left;
+  var y2 = pvr.top - cr.top;
+
+  // Cubic bezier: arc right and up from Pedido, then curve down into the top of Proveedores
+  var cx1 = x1 + 50, cy1 = y1 - 40;
+  var cx2 = x2 + 40, cy2 = y2 - 40;
+  var d = 'M ' + x1.toFixed(1) + ' ' + y1.toFixed(1)
+        + ' C ' + cx1.toFixed(1) + ' ' + cy1.toFixed(1)
+        + ', '  + cx2.toFixed(1) + ' ' + cy2.toFixed(1)
+        + ', '  + x2.toFixed(1)  + ' ' + y2.toFixed(1);
+
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#C05621');
+  path.setAttribute('stroke-width', '2');
+  path.setAttribute('stroke-dasharray', '6 3');
+  path.setAttribute('marker-end', 'url(#arrowCrossOrange)');
+  path.setAttribute('data-pedido-prov', '1');
+  svg.appendChild(path);
+}
+
+function alignSections() {
+  function matchHeights(selA, selB) {
+    var a = document.querySelector(selA);
+    var b = document.querySelector(selB);
+    if (!a || !b) return;
+    a.style.minHeight = '';
+    b.style.minHeight = '';
+    var h = Math.max(a.offsetHeight, b.offsetHeight);
+    a.style.minHeight = h + 'px';
+    b.style.minHeight = h + 'px';
+  }
+  matchHeights('#maradBody .compras-box',   '#erpBody .compras-box');
+  matchHeights('#maradBody .marad-top-wrap', '#erpBody .erp-top-split');
+  matchHeights('#maradBody .bottom-section', '#erpBody .bottom-section');
+}
+
+function redrawAll() {
+  alignSections();
+  drawConnectors('connectorSvg', document.getElementById('maradBody'), '#3B6EA5', '#arrowBlue');
+  drawComprasArrows();
+  drawErpTopArrows();
+  drawErpCentralToMatrix();
+  drawCrossBlockLines();
+  drawComprasCrossLine();
+  drawPedidoProvLine();
+  drawProvToErpLines();
+  drawSyncLines();
+  placeZoomHotspot();
+  placePlanHotspot();
+  placeSolicitudHotspot();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  requestAnimationFrame(function() { requestAnimationFrame(redrawAll); });
+  window.addEventListener('resize', redrawAll);
+});
+</script>
+
+</body>
+</html>
