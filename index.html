@@ -49,6 +49,7 @@
   /* ── MARAD block ── */
   .block-marad {
     flex: 2;
+    align-self: flex-start;
     border: 2px solid #3B6EA5;
     border-radius: 10px;
     background: #FFFFFF;
@@ -382,6 +383,67 @@
   .block-erp .mapeo-table td     { border-color: #B0D8CA; }
   .block-erp .mapeo-table tr:nth-child(even) td { background: #F0FAF6; }
 
+  /* ── API route tags ── */
+  .route-tag {
+    display: inline-block;
+    margin-top: 3px;
+    padding: 1px 5px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.5rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: #2C5282;
+    background: #E3EDFB;
+    border: 1px solid #C3D9F0;
+    border-radius: 3px;
+    max-width: 100%;
+    word-break: break-all;
+    white-space: normal;
+  }
+  .block-erp .route-tag {
+    color: #1A5040;
+    background: #DFF3EA;
+    border-color: #B7E0CD;
+  }
+  .route-tag.route-none {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-style: italic;
+    color: #A0AEC0;
+    background: transparent;
+    border: 1px dashed #CBD5E0;
+    word-break: normal;
+  }
+  .mapeo-title .route-tag { margin-top: 0; margin-left: 8px; vertical-align: middle; }
+  .route-tag.route-wide { width: 180px; max-width: 180px; }
+
+  /* ── Route pills inside modal detail tables ── */
+  .route-pill {
+    display: inline-block;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1A4A8A;
+    background: #DCEAFB;
+    border: 1px solid #A9CBF0;
+    border-radius: 5px;
+    padding: 3px 9px;
+    margin: 8px 4px 4px 0;
+  }
+  .route-pill:first-child { margin-top: 0; }
+  .route-desc {
+    font-size: 0.82rem;
+    color: #4A5568;
+    margin: 0 0 2px 2px;
+    line-height: 1.5;
+  }
+  .route-desc code {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.85em;
+    background: #F0F4F8;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
   /* ── Solicitud status hotspot ── */
   #solicitudHotspot {
     position: absolute; z-index: 25; border-radius: 6px; cursor: zoom-in;
@@ -494,20 +556,22 @@
     position: relative;
     box-shadow: 0 24px 64px rgba(0,0,0,0.22);
   }
-  #zoomModal .zm-close {
+  /* Shared modal chrome — applies to every .zm-box modal (zoom/plan/solicitud/biblioteca/consolidación) */
+  .zm-close {
     position: absolute; top: 14px; right: 18px;
     border: none; background: none; font-size: 1.4rem;
     cursor: pointer; color: #718096; line-height: 1;
     padding: 0 4px;
   }
-  #zoomModal .zm-close:hover { color: #1A2332; }
-  #zoomModal .zm-eyebrow {
+  .zm-close:hover { color: #1A2332; }
+  .zm-eyebrow {
     font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
     text-transform: uppercase; color: #6B46C1; margin-bottom: 4px;
   }
-  #zoomModal .zm-title {
+  .zm-title {
     font-size: 1.05rem; font-weight: 700; color: #1A2332; margin-bottom: 22px;
   }
+  #consolidacionModal .zm-eyebrow { color: #2D7A5F; }
   #zoomModal .zm-legend {
     width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 20px;
   }
@@ -520,13 +584,94 @@
   }
   #zoomModal .zm-legend tr:last-child td { border-bottom: none; }
   #zoomModal .zm-legend tr:nth-child(even) td { background: #FAFBFC; }
+  #zoomModal .zm-note { font-size: 0.74rem; color: #718096; font-style: italic; line-height: 1.5; }
   .block-erp .dot-cell.filled    { color: #2D7A5F; }
   .block-erp .dot-cell.empty     { color: #B0D8CA; }
+
+  /* ── Biblioteca sync hotspot/modal ── */
+  #bibliotecaHotspot {
+    position: absolute; z-index: 25; border-radius: 6px; cursor: zoom-in;
+    background: rgba(160,160,160,0.18); border: 1.5px solid rgba(0,0,0,0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #bibliotecaHotspot:hover { background: rgba(160,160,160,0.32); border-color: rgba(0,0,0,0.6); }
+  #bibliotecaModal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,35,50,0.52); z-index: 3000;
+    align-items: center; justify-content: center;
+  }
+  #bibliotecaModal .zm-box {
+    background: #fff; border-radius: 14px; padding: 32px 36px 28px;
+    width: 640px; max-width: 94vw; position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+  #bibliotecaModal .zm-legend { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 12px; }
+  #bibliotecaModal .zm-legend th {
+    padding: 7px 12px; text-align: left; background: #F7F9FC;
+    border-bottom: 2px solid #E2E8F0; color: #4A5568; font-weight: 600;
+  }
+  #bibliotecaModal .zm-legend td { padding: 8px 12px; border-bottom: 1px solid #EDF2F7; color: #4A5568; vertical-align: top; }
+  #bibliotecaModal .zm-legend tr:last-child td { border-bottom: none; }
+  #bibliotecaModal .zm-legend tr:nth-child(even) td { background: #FAFBFC; }
+  #bibliotecaModal .zm-note { font-size: 0.74rem; color: #718096; font-style: italic; margin-top: 14px; line-height: 1.5; }
+
+  /* ── Consolidación hotspot/modal ── */
+  #consolidacionHotspot {
+    position: absolute; z-index: 25; border-radius: 8px; cursor: zoom-in;
+    background: rgba(160,160,160,0.18); border: 1.5px solid rgba(0,0,0,0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #consolidacionHotspot:hover { background: rgba(160,160,160,0.32); border-color: rgba(0,0,0,0.6); }
+  #consolidacionModal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,35,50,0.52); z-index: 3000;
+    align-items: center; justify-content: center;
+  }
+  #consolidacionModal .zm-box {
+    background: #fff; border-radius: 14px; padding: 32px 36px 28px;
+    width: 640px; max-width: 94vw; position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+  #consolidacionModal .zm-legend { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 12px; }
+  #consolidacionModal .zm-legend th {
+    padding: 7px 12px; text-align: left; background: #F7F9FC;
+    border-bottom: 2px solid #E2E8F0; color: #4A5568; font-weight: 600;
+  }
+  #consolidacionModal .zm-legend td { padding: 8px 12px; border-bottom: 1px solid #EDF2F7; color: #4A5568; vertical-align: top; }
+  #consolidacionModal .zm-legend tr:last-child td { border-bottom: none; }
+  #consolidacionModal .zm-legend tr:nth-child(even) td { background: #FAFBFC; }
+  #consolidacionModal .zm-note { font-size: 0.74rem; color: #718096; font-style: italic; margin-top: 14px; line-height: 1.5; }
+
+  /* ── Pedido hotspot/modal ── */
+  #pedidoHotspot {
+    position: absolute; z-index: 25; border-radius: 8px; cursor: zoom-in;
+    background: rgba(160,160,160,0.18); border: 1.5px solid rgba(0,0,0,0.35);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  #pedidoHotspot:hover { background: rgba(160,160,160,0.32); border-color: rgba(0,0,0,0.6); }
+  #pedidoModal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,35,50,0.52); z-index: 3000;
+    align-items: center; justify-content: center;
+  }
+  #pedidoModal .zm-box {
+    background: #fff; border-radius: 14px; padding: 32px 36px 28px;
+    width: 640px; max-width: 94vw; position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  }
+  #pedidoModal .zm-eyebrow { color: #2D7A5F; }
+  #pedidoModal .zm-legend { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 12px; }
+  #pedidoModal .zm-legend th {
+    padding: 7px 12px; text-align: left; background: #F7F9FC;
+    border-bottom: 2px solid #E2E8F0; color: #4A5568; font-weight: 600;
+  }
+  #pedidoModal .zm-legend td { padding: 8px 12px; border-bottom: 1px solid #EDF2F7; color: #4A5568; vertical-align: top; }
+  #pedidoModal .zm-legend tr:last-child td { border-bottom: none; }
+  #pedidoModal .zm-legend tr:nth-child(even) td { background: #FAFBFC; }
+  #pedidoModal .zm-note { font-size: 0.74rem; color: #718096; font-style: italic; margin-top: 14px; line-height: 1.5; }
 </style>
 </head>
 <body>
-
-<h1>Diagrama de Integración — MARAD &amp; ERP</h1>
 
 <div class="canvas">
 
@@ -551,6 +696,7 @@
             <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
           </svg>
           <span class="tile-icon-label">Solicitud de<br>Materiales</span>
+          <span class="route-tag route-wide">GET /PNPurchase/GetRequisitionDetails</span>
         </div>
       </div>
       <div class="section-divider"></div>
@@ -587,6 +733,7 @@
               <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
             </svg>
             <span class="tile-icon-label">Plan de<br>Mantenimiento</span>
+            <span class="route-tag">/JobOperations</span>
           </div>
           <div class="tile-arrow">→</div>
           <div class="tile-icon-wrap">
@@ -599,6 +746,7 @@
               <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
             </svg>
             <span class="tile-icon-label">Inventario<br>Barco 1</span>
+            <span class="route-tag">/Parts/GetPartsPerVessel</span>
           </div>
         </div>
 
@@ -646,48 +794,6 @@
           </div>
         </div>
 
-        <!-- Terminal MOTI -->
-        <div class="ship-tile" style="border-color: #E53E3E;">
-          <div class="tile-icon-wrap sol-col">
-            <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="4" width="24" height="29" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
-              <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#3B6EA5"/>
-              <line x1="10" y1="14" x2="24" y2="14" stroke="#7AAAD4" stroke-width="1.2"/>
-              <line x1="10" y1="19" x2="24" y2="19" stroke="#7AAAD4" stroke-width="1.2"/>
-              <line x1="10" y1="24" x2="20" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
-              <rect x="6" y="12" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
-              <path d="M6.8 13.8l1 1 1.8-2" fill="none" stroke="#3B6EA5" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round"/>
-              <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
-              <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#3B6EA5" stroke-width="1"/>
-            </svg>
-            <span class="tile-icon-label">Solicitud<br>Mat.</span>
-          </div>
-          <div class="ship-tile-divider"></div>
-          <div class="tile-icon-wrap">
-            <svg width="54" height="60" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="22" height="28" rx="2" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
-              <path d="M18 2v8h8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
-              <path d="M24 2l6 8" fill="none" stroke="#3B6EA5" stroke-width="1.5"/>
-              <line x1="6" y1="16" x2="20" y2="16" stroke="#7AAAD4" stroke-width="1.2"/>
-              <line x1="6" y1="20" x2="20" y2="20" stroke="#7AAAD4" stroke-width="1.2"/>
-              <line x1="6" y1="24" x2="14" y2="24" stroke="#7AAAD4" stroke-width="1.2"/>
-            </svg>
-            <span class="tile-icon-label">Plan de<br>Mantenimiento</span>
-          </div>
-          <div class="tile-arrow">→</div>
-          <div class="tile-icon-wrap">
-            <svg width="54" height="60" viewBox="0 0 34 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="17" cy="8" rx="14" ry="5" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
-              <rect x="3" y="8" width="28" height="20" fill="#EBF2FF" stroke="none"/>
-              <line x1="3" y1="8" x2="3" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
-              <line x1="31" y1="8" x2="31" y2="28" stroke="#3B6EA5" stroke-width="1.5"/>
-              <ellipse cx="17" cy="28" rx="14" ry="5" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
-              <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
-            </svg>
-            <span class="tile-icon-label">Inventario<br>Terminal MOTI</span>
-          </div>
-        </div>
-
       </div>
       </div>
 
@@ -708,13 +814,14 @@
             <ellipse cx="19" cy="19" rx="16" ry="6" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
           </svg>
           <span class="tile-icon-label">Biblioteca de<br>Artículos</span>
+          <span class="route-tag">GET /Parts/GetLibraryParts</span>
         </div>
 
         <div class="tile-arrow" style="font-size:1.4rem; color:#5BAD90; align-self:center;">→</div>
 
         <!-- Mapeo matrix -->
         <div class="mapeo-wrap">
-          <div class="mapeo-title">Mapeo Biblioteca – Barco</div>
+          <div class="mapeo-title">Mapeo Biblioteca – Barco <span class="route-tag">POST /Parts/LinkLibraryParts</span></div>
           <div class="table-scroll">
             <table class="mapeo-table">
               <thead>
@@ -727,39 +834,46 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="comp-cell">Motores Principales</td>
+                  <td class="comp-cell">Herramienta 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
 
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. de Navegación</td>
+                  <td class="comp-cell">Herramienta N</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell empty">○</td>
 
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. Hidráulicos</td>
+                  <td class="comp-cell">Repuesto 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
 
                   <td class="dot-cell empty">○</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Equipos de Cubierta</td>
+                  <td class="comp-cell">Repuesto N</td>
                   <td class="dot-cell empty">○</td>
                   <td class="dot-cell filled">●</td>
 
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. Eléctricos</td>
+                  <td class="comp-cell">Parte 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
 
                   <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Parte N</td>
+                  <td class="dot-cell empty">○</td>
+                  <td class="dot-cell filled">●</td>
+
+                  <td class="dot-cell empty">○</td>
                 </tr>
               </tbody>
             </table>
@@ -791,7 +905,7 @@
       <div class="section-label">Compras y Requisiciones</div>
       <div class="compras-box" style="gap:4px; padding:8px;">
 
-        <!-- Req. de Materiales -->
+        <!-- Req. de Insumos -->
         <div class="ship-tile" style="flex:1; padding:8px 6px;">
           <div class="tile-icon-wrap">
             <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -805,14 +919,15 @@
               <rect x="6" y="17" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#2D7A5F" stroke-width="1"/>
               <rect x="6" y="22" width="3.5" height="3.5" rx="0.5" fill="none" stroke="#2D7A5F" stroke-width="1"/>
             </svg>
-            <span class="tile-icon-label">Req. de<br>Materiales</span>
+            <span class="tile-icon-label">Req. de<br>Insumos</span>
+            <span class="route-tag route-wide">GET /PNPurchase/GetRequisitionDetails</span>
           </div>
         </div>
 
         <div class="tile-arrow" style="color:#2D7A5F; font-size:0.9rem;">→</div>
 
         <!-- Consolidación -->
-        <div class="ship-tile core-highlight" style="flex:1; padding:8px 6px;">
+        <div class="ship-tile core-highlight consolidacion-tile" style="flex:1; padding:8px 6px;">
           <div class="tile-icon-wrap">
             <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2"  y="2"  width="11" height="13" rx="1.5" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.3"/>
@@ -827,6 +942,7 @@
               <line x1="11" y1="29" x2="18" y2="29" stroke="#5BAD90" stroke-width="1"/>
             </svg>
             <span class="tile-icon-label">Consoli-<br>dación</span>
+            <span class="route-tag route-none">sin ruta MARAD — lógica ERP</span>
           </div>
         </div>
 
@@ -846,13 +962,14 @@
               <text x="23" y="31" font-size="6" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif" text-anchor="middle">%</text>
             </svg>
             <span class="tile-icon-label">Cotiza-<br>ción</span>
+            <span class="route-tag">/SupplierQuotation</span>
           </div>
         </div>
 
         <div class="tile-arrow" style="color:#2D7A5F; font-size:0.9rem;">→</div>
 
         <!-- Pedido -->
-        <div class="ship-tile" style="flex:1; padding:8px 6px;">
+        <div class="ship-tile core-highlight pedido-tile" style="flex:1; padding:8px 6px;">
           <div class="tile-icon-wrap">
             <svg width="40" height="44" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="4" y="4" width="20" height="26" rx="2" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
@@ -864,6 +981,7 @@
               <path d="M19 28 L21.5 30.5 L25.5 25" fill="none" stroke="#2D7A5F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span class="tile-icon-label">Pedido</span>
+            <span class="route-tag route-none">no crea la OC — ver detalle</span>
           </div>
         </div>
 
@@ -887,6 +1005,7 @@
                 <ellipse cx="17" cy="16" rx="14" ry="5" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
               </svg>
               <span class="tile-icon-label">Inventario<br>Barco 1</span>
+              <span class="route-tag">POST /Parts/ImportVesselParts</span>
             </div>
           </div>
 
@@ -962,12 +1081,13 @@
             <ellipse cx="19" cy="19" rx="16" ry="6" fill="none" stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
           </svg>
           <span class="tile-icon-label">Biblioteca de<br>Artículos</span>
+          <span class="route-tag">POST /Parts/ImportLibraryParts</span>
         </div>
 
         <div class="tile-arrow" style="font-size:1.4rem; color:#2D7A5F; align-self:center;">→</div>
 
         <div class="mapeo-wrap">
-          <div class="mapeo-title">Mapeo Biblioteca – Barco</div>
+          <div class="mapeo-title">Mapeo Biblioteca – Barco <span class="route-tag">POST /Parts/LinkLibraryParts</span></div>
           <div class="table-scroll">
             <table class="mapeo-table">
               <thead>
@@ -980,34 +1100,40 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="comp-cell">Motores Principales</td>
+                  <td class="comp-cell">Herramienta 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. de Navegación</td>
+                  <td class="comp-cell">Herramienta N</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell empty">○</td>
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. Hidráulicos</td>
+                  <td class="comp-cell">Repuesto 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell empty">○</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Equipos de Cubierta</td>
+                  <td class="comp-cell">Repuesto N</td>
                   <td class="dot-cell empty">○</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
                 </tr>
                 <tr>
-                  <td class="comp-cell">Sist. Eléctricos</td>
+                  <td class="comp-cell">Parte 1</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
                   <td class="dot-cell filled">●</td>
+                </tr>
+                <tr>
+                  <td class="comp-cell">Parte N</td>
+                  <td class="dot-cell empty">○</td>
+                  <td class="dot-cell filled">●</td>
+                  <td class="dot-cell empty">○</td>
                 </tr>
               </tbody>
             </table>
@@ -1042,9 +1168,12 @@
     <span class="tile-icon-label">Proveedores</span>
   </div>
 
-  <div id="zoomHotspot" onclick="openZoomModal()" title="Ver detalle: Integración Inventario Barco 1"></div>
+  <div id="zoomHotspot" onclick="openZoomModal()" title="Ver detalle: Detección de consumo (Salida)"></div>
   <div id="maradPlanHotspot" onclick="openPlanModal()" title="Ver estructura interna del Plan de Mantenimiento"></div>
   <div id="solicitudHotspot" onclick="openSolicitudModal()" title="Ver actualización de estados"></div>
+  <div id="bibliotecaHotspot" onclick="openBibliotecaModal()" title="Ver detalle: Sincronización de catálogo e inventario"></div>
+  <div id="consolidacionHotspot" onclick="openConsolidacionModal()" title="Ver detalle: Consolidación de órdenes de compra"></div>
+  <div id="pedidoHotspot" onclick="openPedidoModal()" title="Ver detalle: ¿quién crea la Orden de Compra?"></div>
 
   <svg id="connectorSvgCross" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -1053,9 +1182,6 @@
       </marker>
       <marker id="arrowCrossRed"   markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
         <polygon points="0 0, 7 2.5, 0 5" fill="#E53E3E" opacity="0.9"/>
-      </marker>
-      <marker id="arrowCrossBlack" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-        <polygon points="0 0, 7 2.5, 0 5" fill="#2D3748" opacity="0.9"/>
       </marker>
       <marker id="arrowCrossSync" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
         <polygon points="0 0, 7 2.5, 0 5" fill="#6B46C1" opacity="0.9"/>
@@ -1185,6 +1311,12 @@
       <div><span style="display:inline-block; width:12px; height:12px; background:#FFFBEB; border:1.5px solid #D69E2E; border-radius:2px; vertical-align:middle; margin-right:5px;"></span><strong style="color:#744210;">Job con inventario</strong> — descuenta piezas/repuestos del barco al ejecutarse.</div>
       <div><span style="display:inline-block; width:12px; height:12px; background:#F7FAFC; border:1.5px solid #CBD5E0; border-radius:2px; vertical-align:middle; margin-right:5px;"></span><strong style="color:#718096;">Job sin consumo</strong> — inspecciones, revisiones o ajustes que no requieren materiales.</div>
     </div>
+    <div style="margin-top:14px; padding-top:12px; border-top:1px solid #EDF2F7; font-size:0.74rem; color:#718096; line-height:1.6;">
+      <strong style="color:#4A5568;">Rutas de API:</strong>
+      Plan / Job → <code style="font-family:'Courier New',monospace;">/JobOperations</code> (CRUD) e historial vía <code style="font-family:'Courier New',monospace;">/JobHistoryOperations</code> ·
+      Parte / Sub-Parte → <code style="font-family:'Courier New',monospace;">/Components/GetVesselComponents</code> (jerarquía por <code style="font-family:'Courier New',monospace;">parentID</code>), distribuidos desde librería vía <code style="font-family:'Courier New',monospace;">LibraryComponentOperations/CopyComponentsToVessels</code> ·
+      Job → consume → Inventario → <code style="font-family:'Courier New',monospace;">POST /Parts/ImportVesselParts</code>
+    </div>
   </div>
 </div>
 
@@ -1208,6 +1340,7 @@
         </div>
         <span class="sol-status-label">Pedido</span>
         <span class="sol-status-desc">Solicitud creada y enviada al ERP</span>
+        <span class="route-tag">POST /PNPurchase/ImportRequisitions</span>
       </div>
 
       <div class="sol-status-connector"></div>
@@ -1222,6 +1355,7 @@
         </div>
         <span class="sol-status-label">Cotización</span>
         <span class="sol-status-desc">Proveedor responde con precios y plazos</span>
+        <span class="route-tag">/SupplierQuotation</span>
       </div>
 
       <div class="sol-status-connector"></div>
@@ -1237,6 +1371,7 @@
         </div>
         <span class="sol-status-label">Despacho</span>
         <span class="sol-status-desc">Orden confirmada y material en tránsito</span>
+        <span class="route-tag">PATCH /PNPurchase/UpdatePurchaseOrders</span>
       </div>
 
       <div class="sol-status-connector"></div>
@@ -1250,6 +1385,7 @@
         </div>
         <span class="sol-status-label">Recibido</span>
         <span class="sol-status-desc">Material ingresado al inventario del barco</span>
+        <span class="route-tag">POST /Parts/ImportVesselParts</span>
       </div>
 
     </div>
@@ -1261,17 +1397,15 @@
   <div id="zoomModalBox">
     <button class="zm-close" onclick="closeZoomModal()">×</button>
     <div class="zm-eyebrow">Detalle de Integración</div>
-    <div class="zm-title">Inventario Barco 1 — MARAD ↔ ERP</div>
+    <div class="zm-title">Detección de Consumo (Salida) — Inventario Barco 1</div>
 
-    <svg viewBox="0 0 540 170" width="100%" style="display:block;">
+    <svg viewBox="0 0 540 140" width="100%" style="display:block;">
       <defs>
-        <marker id="zmBlue"  markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#3B6EA5"/></marker>
         <marker id="zmRed"   markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#E53E3E"/></marker>
-        <marker id="zmBlack" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#2D3748"/></marker>
       </defs>
 
       <!-- MARAD DB cylinder -->
-      <g transform="translate(20,44)">
+      <g transform="translate(20,24)">
         <ellipse cx="40" cy="13" rx="40" ry="13" fill="#EBF2FF" stroke="#3B6EA5" stroke-width="1.5"/>
         <rect x="0" y="13" width="80" height="52" fill="#EBF2FF"/>
         <line x1="0"  y1="13" x2="0"  y2="65" stroke="#3B6EA5" stroke-width="1.5"/>
@@ -1279,11 +1413,11 @@
         <ellipse cx="40" cy="65" rx="40" ry="13" fill="#D6E8FF" stroke="#3B6EA5" stroke-width="1.5"/>
         <ellipse cx="40" cy="32" rx="40" ry="13" fill="none"    stroke="#7AAAD4" stroke-width="1" stroke-dasharray="3 2"/>
       </g>
-      <text x="60" y="135" text-anchor="middle" font-size="10" fill="#3B6EA5" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
-      <text x="60" y="148" text-anchor="middle" font-size="9"  fill="#7AAAD4" font-family="Segoe UI,sans-serif">MARAD</text>
+      <text x="60" y="115" text-anchor="middle" font-size="10" fill="#3B6EA5" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
+      <text x="60" y="128" text-anchor="middle" font-size="9"  fill="#7AAAD4" font-family="Segoe UI,sans-serif">MARAD</text>
 
       <!-- ERP DB cylinder -->
-      <g transform="translate(440,44)">
+      <g transform="translate(440,24)">
         <ellipse cx="40" cy="13" rx="40" ry="13" fill="#EBF6F2" stroke="#2D7A5F" stroke-width="1.5"/>
         <rect x="0" y="13" width="80" height="52" fill="#EBF6F2"/>
         <line x1="0"  y1="13" x2="0"  y2="65" stroke="#2D7A5F" stroke-width="1.5"/>
@@ -1291,47 +1425,134 @@
         <ellipse cx="40" cy="65" rx="40" ry="13" fill="#C0E8D8" stroke="#2D7A5F" stroke-width="1.5"/>
         <ellipse cx="40" cy="32" rx="40" ry="13" fill="none"    stroke="#5BAD90" stroke-width="1" stroke-dasharray="3 2"/>
       </g>
-      <text x="480" y="135" text-anchor="middle" font-size="10" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
-      <text x="480" y="148" text-anchor="middle" font-size="9"  fill="#5BAD90" font-family="Segoe UI,sans-serif">ERP</text>
+      <text x="480" y="115" text-anchor="middle" font-size="10" fill="#2D7A5F" font-weight="700" font-family="Segoe UI,sans-serif">Inventario Barco 1</text>
+      <text x="480" y="128" text-anchor="middle" font-size="9"  fill="#5BAD90" font-family="Segoe UI,sans-serif">ERP</text>
 
-      <!-- Arrow 1 — blue "+"  (ERP → MARAD) -->
-      <line x1="440" y1="75" x2="100" y2="75" stroke="#3B6EA5" stroke-width="2" marker-end="url(#zmBlue)"/>
-      <rect x="228" y="62" width="84" height="16" rx="4" fill="#EBF2FF"/>
-      <text x="270" y="74" text-anchor="middle" font-size="11" fill="#3B6EA5" font-weight="800" font-family="Segoe UI,sans-serif">+  Entrada</text>
-
-      <!-- Arrow 2 — red "−"  MARAD → ERP -->
-      <line x1="100" y1="97" x2="440" y2="97" stroke="#E53E3E" stroke-width="2" marker-end="url(#zmRed)"/>
-      <rect x="220" y="84" width="100" height="16" rx="4" fill="#FFF5F5"/>
-      <text x="270" y="96" text-anchor="middle" font-size="11" fill="#E53E3E" font-weight="800" font-family="Segoe UI,sans-serif">−  Salida</text>
-
-      <!-- Arrow 3 — dark "Ajustes Inventarios" -->
-      <line x1="440" y1="119" x2="100" y2="119" stroke="#2D3748" stroke-width="2" marker-end="url(#zmBlack)"/>
-      <rect x="188" y="106" width="164" height="16" rx="4" fill="#EDF2F7"/>
-      <text x="270" y="118" text-anchor="middle" font-size="10" fill="#2D3748" font-weight="700" font-family="Segoe UI,sans-serif">Ajustes Inventarios</text>
+      <!-- Salida — MARAD → ERP -->
+      <line x1="100" y1="55" x2="440" y2="55" stroke="#E53E3E" stroke-width="2" marker-end="url(#zmRed)"/>
+      <rect x="220" y="42" width="100" height="16" rx="4" fill="#FFF5F5"/>
+      <text x="270" y="54" text-anchor="middle" font-size="11" fill="#E53E3E" font-weight="800" font-family="Segoe UI,sans-serif">−  Salida</text>
     </svg>
 
     <table class="zm-legend">
       <thead>
-        <tr><th>Flujo</th><th>Descripción</th><th>Dirección</th></tr>
+        <tr><th>Flujo</th><th>Descripción</th><th>Origen</th><th>Ruta API</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td><span style="color:#3B6EA5;font-weight:700;">+ Entrada</span></td>
-          <td>Suma de cantidades al inventario del barco</td>
-          <td style="color:#718096;">ERP → MARAD</td>
-        </tr>
-        <tr>
           <td><span style="color:#E53E3E;font-weight:700;">− Salida</span></td>
-          <td>Resta de cantidades del inventario del barco</td>
-          <td style="color:#718096;">MARAD → ERP</td>
-        </tr>
-        <tr>
-          <td><span style="color:#2D3748;font-weight:700;">Ajustes</span></td>
-          <td>Corrección de cantidades sin movimiento de entrada/salida</td>
-          <td style="color:#718096;">ERP → MARAD</td>
+          <td>Consumo por un job de mantenimiento — ocurre primero en MARAD</td>
+          <td style="color:#718096;">MARAD → ERP<br><span style="font-size:0.68rem; font-style:italic;">(polling)</span></td>
+          <td><div class="route-pill" style="margin:0;">GET /Parts/GetPartsPerVessel</div></td>
         </tr>
       </tbody>
     </table>
+    <div class="zm-note" style="margin-top:10px;">
+      MARAD no expone webhooks: la Salida no se empuja, el ERP la detecta sondeando <code>GetPartsPerVessel</code> y comparando contra el valor anterior de <code>rob</code>. Tampoco hay forma de ver qué consumió un job puntual — <code>JobHistoryDTO</code> no registra partes ni cantidades. (Entrada y Ajustes son un push simple del ERP — ver la tarjeta de Sincronización).
+    </div>
+  </div>
+</div>
+
+<!-- ── Biblioteca sync detail modal ── -->
+<div id="bibliotecaModal" onclick="if(event.target===this)closeBibliotecaModal()">
+  <div class="zm-box">
+    <button class="zm-close" onclick="closeBibliotecaModal()">×</button>
+    <div class="zm-eyebrow">Integración MARAD ↔ ERP</div>
+    <div class="zm-title">Sincronización MARAD ↔ ERP — Catálogo e Inventario</div>
+    <table class="zm-legend">
+      <tbody>
+        <tr>
+          <td><strong>Alta de ítems</strong></td>
+          <td>Se crean una sola vez en el catálogo central y se distribuyen a los barcos que los requieren</td>
+        </tr>
+        <tr>
+          <td><strong>Resultado</strong></td>
+          <td>Un ítem, una identidad, reutilizable en toda la flota (hoy: ~29% de ítems duplicados detectados en la flota de Trader Tanker)</td>
+        </tr>
+        <tr>
+          <td><strong>Rol del ERP</strong></td>
+          <td>El maestro de artículos del ERP debe sincronizarse contra el catálogo central, no contra cada barco por separado</td>
+        </tr>
+        <tr>
+          <td><strong>Rutas de API<br><span style="font-weight:400; color:#A0AEC0;">(catálogo)</span></strong></td>
+          <td>
+            <div class="route-pill">GET /Parts/GetLibraryParts</div>
+            <div class="route-desc">lectura del catálogo central — incluye <code>vesselNames[]</code> y <code>componentNames[]</code>, es decir, la matriz de mapeo completa en una sola llamada</div>
+            <div class="route-pill">POST /Parts/ImportLibraryParts</div>
+            <div class="route-desc">alta masiva de ítems en el catálogo central</div>
+            <div class="route-pill">POST /Parts/LinkLibraryParts <span style="font-weight:400;">/</span> UnLinkLibraryParts</div>
+            <div class="route-desc">distribuir o retirar un ítem de barcos específicos — payload <code>{partID, vesselNames[], componentNames[]}</code></div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Entrada / Ajustes<br><span style="font-weight:400; color:#A0AEC0;">(inventario por barco)</span></strong></td>
+          <td>
+            <div class="route-desc" style="margin-top:0;">Recepción de material o corrección de cantidades (ej. conteo físico) — el ERP envía la nueva cantidad de un ítem para un barco. Misma lógica que el catálogo: el ERP empuja, MARAD no expone push propio.</div>
+            <div class="route-pill">POST /Parts/ImportVesselParts</div>
+            <div class="route-desc"><code>rob</code> (Remaining On Board) es un valor <strong>absoluto</strong>, no un delta — no hay endpoint de "movimiento" con signo, por eso Entrada y Ajustes comparten esta misma ruta. (El consumo por un job — Salida — es distinto: no se empuja, se detecta por polling — ver tarjeta "Inventario Barco 1").</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="zm-note">MARAD ya cuenta con un mecanismo de catálogo central distribuible a la flota — la duplicación actual parece ser un tema de uso/gobierno de datos, no una limitación de la plataforma origen. A validar con el equipo operativo antes de fijar este requisito en el RFP.</div>
+  </div>
+</div>
+
+<!-- ── Consolidación de compras detail modal ── -->
+<div id="consolidacionModal" onclick="if(event.target===this)closeConsolidacionModal()">
+  <div class="zm-box">
+    <button class="zm-close" onclick="closeConsolidacionModal()">×</button>
+    <div class="zm-eyebrow">Integración MARAD ↔ ERP</div>
+    <div class="zm-title">Consolidación de Órdenes de Compra Multi-Barco</div>
+    <table class="zm-legend">
+      <tbody>
+        <tr>
+          <td><strong>Alcance de la orden</strong></td>
+          <td>Requisiciones de múltiples barcos consolidadas en una sola orden de compra por proveedor (hoy: una orden por barco, procesada de forma individual)</td>
+        </tr>
+        <tr>
+          <td><strong>Fuente de datos</strong></td>
+          <td>La información de origen en MARAD ya está disponible a nivel de toda la flota — la consolidación es una capacidad a exigir en el diseño de la integración, no una limitación del sistema origen (hoy: integración puntual, sin consolidar)</td>
+        </tr>
+        <tr>
+          <td><strong>Rutas de API</strong></td>
+          <td>
+            <div class="route-desc" style="margin-top:0;">Usa los datos de <strong>Req. de Insumos</strong> (<code>GetRequisitionDetails</code>) — la consolidación en sí no tiene ruta propia, es lógica a construir en el ERP sobre ese mismo feed.</div>
+            <div class="route-desc" style="font-style:italic; color:#A0AEC0;">¿Qué pasa con esa consolidación del lado de MARAD una vez decidida? Ver detalle en <strong>Pedido</strong>.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="zm-note">A validar con el equipo operativo si hoy existe algún reporte o proceso manual que ya consolide esta información a nivel flota.</div>
+  </div>
+</div>
+
+<!-- ── Pedido detail modal ── -->
+<div id="pedidoModal" onclick="if(event.target===this)closePedidoModal()">
+  <div class="zm-box">
+    <button class="zm-close" onclick="closePedidoModal()">×</button>
+    <div class="zm-eyebrow">Integración MARAD ↔ ERP</div>
+    <div class="zm-title">¿Quién crea la Orden de Compra?</div>
+    <table class="zm-legend">
+      <tbody>
+        <tr>
+          <td><strong>Lo que confirma el spec</strong></td>
+          <td>Ninguna ruta de la API crea una orden de compra. <code>GetRequisitionDetails</code> (ver <strong>Req. de Insumos</strong>) ya devuelve "requisitions, purchase orders <strong>and</strong> quotations" — es decir, MARAD ya modela la OC como una entidad propia, existente <em>antes</em> de que el ERP la lea.</td>
+        </tr>
+        <tr>
+          <td><strong>Qué hace PATCH entonces</strong></td>
+          <td>
+            <div class="route-pill" style="margin-top:0;">PATCH /PNPurchase/UpdatePurchaseOrders <span style="font-weight:400;">/</span> UpdateOrderLines</div>
+            <div class="route-desc">Solo edita campos puntuales de una OC/línea que <strong>ya existe</strong> (precio de flete, aprobación financiera, factura recibida, número de OC, precio o cantidad de una línea) — no la crea ni la emite. Payload = <code>POID</code>/<code>OrderLineID</code> + solo los campos a cambiar.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Pregunta abierta</strong></td>
+          <td>¿Dónde y cómo nace la OC hoy — directamente en MARAD (equipo de compras) o en otro sistema que luego la sincroniza? De eso depende si "Pedido" en el ERP es un paso de <strong>creación</strong> (sin ruta disponible en esta API) o de <strong>confirmación/sincronización</strong> de campos administrativos sobre una OC que ya nació en MARAD. A validar con el equipo operativo antes de comprometer este flujo en el RFP.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="zm-note">Si la consolidación (ver modal anterior) decide agrupar requisiciones de varios barcos en una sola OC, ese agrupamiento tampoco tiene ruta propia — sería, en el mejor de los casos, una serie de <code>PATCH</code> sobre OCs que MARAD ya creó individualmente, no una fusión real en una sola orden.</div>
   </div>
 </div>
 
@@ -1496,9 +1717,7 @@ function drawCrossBlockLines() {
   var erpY = ei.top + ei.height / 2 - cr.top;
 
   var configs = [
-    { offset: -22, color: '#3B6EA5', marker: 'arrowCrossBlue',  label: '+',                   fromErp: true  },
-    { offset:   0, color: '#E53E3E', marker: 'arrowCrossRed',   label: '−',                   fromErp: false },
-    { offset:  22, color: '#2D3748', marker: 'arrowCrossBlack', label: 'Ajustes Inventarios', fromErp: true  }
+    { offset: 0, color: '#E53E3E', marker: 'arrowCrossRed', label: '− Salida', fromErp: false }
   ];
 
   configs.forEach(function(cfg) {
@@ -1624,9 +1843,82 @@ function placePlanHotspot() {
 
 function openPlanModal()  { document.getElementById('maradPlanModal').style.display = 'flex'; }
 function closePlanModal() { document.getElementById('maradPlanModal').style.display = 'none'; }
+function openBibliotecaModal()  { document.getElementById('bibliotecaModal').style.display = 'flex'; }
+function closeBibliotecaModal() { document.getElementById('bibliotecaModal').style.display = 'none'; }
+function openConsolidacionModal()  { document.getElementById('consolidacionModal').style.display = 'flex'; }
+function closeConsolidacionModal() { document.getElementById('consolidacionModal').style.display = 'none'; }
+function openPedidoModal()  { document.getElementById('pedidoModal').style.display = 'flex'; }
+function closePedidoModal() { document.getElementById('pedidoModal').style.display = 'none'; }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeZoomModal(); closePlanModal(); closeSolicitudModal(); }
+  if (e.key === 'Escape') {
+    closeZoomModal(); closePlanModal(); closeSolicitudModal();
+    closeBibliotecaModal(); closeConsolidacionModal(); closePedidoModal();
+  }
 });
+
+function placeBibliotecaHotspot() {
+  var canvas  = document.querySelector('.canvas');
+  var hotspot = document.getElementById('bibliotecaHotspot');
+  if (!canvas || !hotspot) return;
+  var cr = canvas.getBoundingClientRect();
+
+  // Cover the two "Sincronización" rails drawn by drawSyncLines() below the canvas,
+  // not the Biblioteca de Artículos icons themselves.
+  var elems = [
+    document.querySelector('#erpBody  .biblioteca-db svg'),
+    document.querySelector('#maradBody .biblioteca-db svg'),
+    document.querySelector('#erpBody  .mapeo-table'),
+    document.querySelector('#maradBody .mapeo-table')
+  ];
+  if (elems.some(function(e) { return !e; })) return;
+
+  var xs = elems.map(function(e) {
+    var r = e.getBoundingClientRect();
+    return r.left + r.width / 2 - cr.left;
+  });
+  var minX = Math.min.apply(null, xs);
+  var maxX = Math.max.apply(null, xs);
+
+  var pad    = 10;
+  var baseY  = cr.height + 28; // matches drawSyncLines()' baseY
+  var topY   = baseY - pad;
+  var bottomY = baseY + 22 + pad; // covers both rails (extraY 0 and 22)
+
+  hotspot.style.left   = minX + 'px';
+  hotspot.style.top    = topY + 'px';
+  hotspot.style.width  = (maxX - minX) + 'px';
+  hotspot.style.height = (bottomY - topY) + 'px';
+}
+
+function placeConsolidacionHotspot() {
+  var canvas  = document.querySelector('.canvas');
+  var hotspot = document.getElementById('consolidacionHotspot');
+  var tile    = document.querySelector('#erpBody .compras-box .consolidacion-tile');
+  if (!canvas || !hotspot || !tile) return;
+  var cr  = canvas.getBoundingClientRect();
+  var tr  = tile.getBoundingClientRect();
+  var pad = 4;
+
+  hotspot.style.left   = (tr.left - cr.left - pad) + 'px';
+  hotspot.style.top    = (tr.top - cr.top - pad) + 'px';
+  hotspot.style.width  = (tr.width + pad * 2) + 'px';
+  hotspot.style.height = (tr.height + pad * 2) + 'px';
+}
+
+function placePedidoHotspot() {
+  var canvas  = document.querySelector('.canvas');
+  var hotspot = document.getElementById('pedidoHotspot');
+  var tile    = document.querySelector('#erpBody .compras-box .pedido-tile');
+  if (!canvas || !hotspot || !tile) return;
+  var cr  = canvas.getBoundingClientRect();
+  var tr  = tile.getBoundingClientRect();
+  var pad = 4;
+
+  hotspot.style.left   = (tr.left - cr.left - pad) + 'px';
+  hotspot.style.top    = (tr.top - cr.top - pad) + 'px';
+  hotspot.style.width  = (tr.width + pad * 2) + 'px';
+  hotspot.style.height = (tr.height + pad * 2) + 'px';
+}
 
 function placeZoomHotspot() {
   var canvas  = document.querySelector('.canvas');
@@ -1745,7 +2037,7 @@ function drawComprasCrossLine() {
   if (!maradSol) return;
   var mr = maradSol.getBoundingClientRect();
 
-  // Destination: left edge / center-y of ERP Req. de Materiales icon (first tile-icon-wrap in ERP compras-box)
+  // Destination: left edge / center-y of ERP Req. de Insumos icon (first tile-icon-wrap in ERP compras-box)
   var erpReq = document.querySelector('#erpBody .compras-box .tile-icon-wrap svg');
   if (!erpReq) return;
   var er = erpReq.getBoundingClientRect();
@@ -1878,7 +2170,6 @@ function alignSections() {
     b.style.minHeight = h + 'px';
   }
   matchHeights('#maradBody .compras-box',   '#erpBody .compras-box');
-  matchHeights('#maradBody .marad-top-wrap', '#erpBody .erp-top-split');
   matchHeights('#maradBody .bottom-section', '#erpBody .bottom-section');
 }
 
@@ -1896,6 +2187,9 @@ function redrawAll() {
   placeZoomHotspot();
   placePlanHotspot();
   placeSolicitudHotspot();
+  placeBibliotecaHotspot();
+  placeConsolidacionHotspot();
+  placePedidoHotspot();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
